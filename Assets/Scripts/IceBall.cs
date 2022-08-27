@@ -17,7 +17,10 @@ public class IceBall : MonoBehaviour
     {
         if (other.CompareTag(Tags.enemyTag))
         {
+            StateController state = other.GetComponentInChildren<StateController>();
 
+            if (state)
+                state.Baraf();
 
             Destroy(gameObject); 
         }
