@@ -16,6 +16,17 @@ public class playerMovement : MonoBehaviour
 
     PickUpHandler pickupHandlerInstance;
 
+    [Header("Dash Controls")]
+    [SerializeField] private float _dashingVelocity;
+    [SerializeField] private float _dashingTime = 0;
+    [SerializeField] KeyCode dashingKey;
+
+    Vector2 _dashingDir;
+    bool _isDashing;
+    bool _canDash = true;
+
+    [SerializeField] TrailRenderer trailRenderer;
+
     private void Start()
     {
         pickupHandlerInstance = GetComponent<PickUpHandler>();
@@ -26,6 +37,14 @@ public class playerMovement : MonoBehaviour
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
+
+        Dash(movement.x, movement.y);
+
+        
+
+
+
+       
 
         if(movement.sqrMagnitude> 0.1f)
         {
@@ -44,6 +63,37 @@ public class playerMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        if(!_isDashing)
+            rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
+        if (_isDashing)
+        {
+            rb.velocity = _dashingDir.normalized * _dashingVelocity;
+            return;
+        }
+    }
+
+    private void Dash(float inputX, float inputY)
+    {
+        if (Input.GetKeyDown(dashingKey) && _canDash)
+        {
+            _isDashing = true;
+            _canDash = false;
+            trailRenderer.emitting = true;
+            _dashingDir = new Vector2(inputX, inputY);
+
+            if (_dashingDir == Vector2.zero)
+            {
+                _dashingDir = new Vector2(transform.localScale.x, 0);
+            }
+            StartCoroutine(StopDashingCoroutine());
+        }
+    }
+
+    private IEnumerator StopDashingCoroutine()
+    {
+        yield return new WaitForSeconds(_dashingTime);
+        trailRenderer.emitting = false;
+        _isDashing = false;
+        _canDash = true;
     }
 }
