@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
 
 public class playerMovement : MonoBehaviour
 {
@@ -27,33 +28,44 @@ public class playerMovement : MonoBehaviour
 
     [SerializeField] TrailRenderer trailRenderer;
 
+    PhotonView photonViewInstance;
+
+
     private void Start()
     {
         pickupHandlerInstance = GetComponent<PickUpHandler>();
         pickupHandlerInstance.Direction = new Vector2(0, 0);
+
+        photonViewInstance = GetComponent<PhotonView>();
     }
 
     void Update()
+    {
+        if(photonViewInstance.IsMine)
+            Movement();
+    }
+
+    private void Movement()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
 
         Dash(movement.x, movement.y);
 
-        
 
 
 
-       
 
-        if(movement.sqrMagnitude> 0.1f)
+
+
+        if (movement.sqrMagnitude > 0.1f)
         {
             pickupHandlerInstance.Direction = movement.normalized;
         }
 
         if (movement.x < 0)
             spriteRend.flipX = true;
-        else if(movement.x > 0)
+        else if (movement.x > 0)
             spriteRend.flipX = false;
 
         anim.SetFloat("Horizontal", movement.x);
