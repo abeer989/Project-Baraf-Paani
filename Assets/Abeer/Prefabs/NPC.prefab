@@ -211,6 +211,8 @@ MonoBehaviour:
   characterName: Amna
   moveSpeed: 4
   waitTime: 0.3
+  spriteRenderer: {fileID: 8293935526714860957}
+  state: {fileID: 1545191305933811223}
 --- !u!212 &8293935526714860957
 SpriteRenderer:
   m_ObjectHideFlags: 0

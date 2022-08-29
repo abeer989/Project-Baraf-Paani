@@ -41,7 +41,7 @@ public class playerMovement : MonoBehaviour
 
     void Update()
     {
-        if(photonViewInstance.IsMine)
+        //if (photonViewInstance.IsMine)
             Movement();
     }
 
@@ -51,12 +51,6 @@ public class playerMovement : MonoBehaviour
         movement.y = Input.GetAxisRaw("Vertical");
 
         Dash(movement.x, movement.y);
-
-
-
-
-
-
 
         if (movement.sqrMagnitude > 0.1f)
         {

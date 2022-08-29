@@ -4,11 +4,16 @@ using UnityEngine;
 
 public class PickUpHandler : MonoBehaviour
 {
-    public Transform holdSpot;
-    public LayerMask pickUpMask;
-
     public Vector3 Direction { get; set; }
-    private GameObject itemHolding;
+
+    [SerializeField] Transform holdSpot;
+    [SerializeField] LayerMask pickUpMask;
+
+    [Space]
+    [SerializeField] float throwSpeed;
+
+    GameObject itemHolding;
+    
 
     private void Update()
     {
@@ -16,14 +21,17 @@ public class PickUpHandler : MonoBehaviour
         {
             if(itemHolding)
             {
-                itemHolding.transform.position = transform.position + Direction;
                 itemHolding.transform.parent = null;
 
                 if (itemHolding.GetComponent<Rigidbody2D>())
-                    itemHolding.GetComponent<Rigidbody2D>().simulated = true;
+                {
+                    Rigidbody2D rb = itemHolding.GetComponent<Rigidbody2D>();
+                    rb.velocity = Direction * throwSpeed;
+                }
 
                 itemHolding = null;
             }
+
             else
             {
                 Collider2D pickupItemColl = Physics2D.OverlapCircle(transform.position + Direction, .4f, pickUpMask);
@@ -33,9 +41,6 @@ public class PickUpHandler : MonoBehaviour
                     itemHolding = pickupItemColl.gameObject;
                     itemHolding.transform.position = holdSpot.position;
                     itemHolding.transform.parent = transform;
-
-                    if (itemHolding.GetComponent<Rigidbody2D>())
-                        itemHolding.GetComponent<Rigidbody2D>().simulated = false;
                 }
             }
         }

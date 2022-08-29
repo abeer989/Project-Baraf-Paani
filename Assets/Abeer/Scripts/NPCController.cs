@@ -15,15 +15,17 @@ public class NPCController : MonoBehaviour
     [SerializeField] float waitTime;
 
     Transform jail;
-    SpriteRenderer spriteRenderer;
-    StateController state;
+    [SerializeField] SpriteRenderer spriteRenderer;
+    [SerializeField] StateController state;
+
+    [SerializeField] bool move;
 
     int currentTargetedPoint;
     float waitCounter;
 
     private void OnEnable()
     {
-        jail = FindObjectOfType<Jail>().transform;
+        //jail = FindObjectOfType<Jail>().transform;
         state = GetComponentInChildren<StateController>();
 
         gameObject.name = characterName;
@@ -42,25 +44,28 @@ public class NPCController : MonoBehaviour
     {
         if (!state.IsBaraf)
         {
-            if (movePoints.Count > 0)
+            if (move)
             {
-                transform.position = Vector2.MoveTowards(transform.position, movePoints[currentTargetedPoint].position, moveSpeed * Time.deltaTime);
-
-                if (Vector2.Distance(transform.position, movePoints[currentTargetedPoint].position) < 0.02)
+                if (movePoints.Count > 0)
                 {
-                    waitCounter -= Time.deltaTime;
+                    transform.position = Vector2.MoveTowards(transform.position, movePoints[currentTargetedPoint].position, moveSpeed * Time.deltaTime);
 
-                    if (waitCounter <= 0)
+                    if (Vector2.Distance(transform.position, movePoints[currentTargetedPoint].position) < 0.02)
                     {
-                        currentTargetedPoint++;
+                        waitCounter -= Time.deltaTime;
 
-                        if (currentTargetedPoint >= movePoints.Count)
-                            currentTargetedPoint = 0;
+                        if (waitCounter <= 0)
+                        {
+                            currentTargetedPoint++;
 
-                        waitCounter = waitTime;
+                            if (currentTargetedPoint >= movePoints.Count)
+                                currentTargetedPoint = 0;
+
+                            waitCounter = waitTime;
+                        }
                     }
-                }
-            } 
+                }  
+            }
         }
 
         else
