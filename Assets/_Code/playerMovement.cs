@@ -2,21 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using Photon.Realtime;
 
-public class playerMovement : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     // Start is called before the first frame update
+    [Header("Movement Related")]
     public float moveSpeed = 5f;
-
     public Rigidbody2D rb;
 
     Vector2 movement;
 
+
     [SerializeField] Animator anim;
-    [SerializeField] SpriteRenderer spriteRend;
-
-    PickUpHandler pickupHandlerInstance;
-
+    
+    
     [Header("Dash Controls")]
     [SerializeField] private float _dashingVelocity;
     [SerializeField] private float _dashingTime = 0;
@@ -28,20 +28,25 @@ public class playerMovement : MonoBehaviour
 
     [SerializeField] TrailRenderer trailRenderer;
 
-    PhotonView photonViewInstance;
 
+    [Header("Other References")]
+
+    public PickUpHandler pickupHandlerInstance;
+
+    private PhotonView photonView;
 
     private void Start()
     {
         pickupHandlerInstance = GetComponent<PickUpHandler>();
         pickupHandlerInstance.Direction = new Vector2(0, 0);
 
-        photonViewInstance = GetComponent<PhotonView>();
+        photonView = GetComponent<PhotonView>();
+        
     }
 
     void Update()
     {
-        if(photonViewInstance.IsMine)
+        if (photonView.IsMine)
             Movement();
     }
 
@@ -53,20 +58,12 @@ public class playerMovement : MonoBehaviour
         Dash(movement.x, movement.y);
 
 
-
-
-
-
-
         if (movement.sqrMagnitude > 0.1f)
         {
             pickupHandlerInstance.Direction = movement.normalized;
         }
 
-        if (movement.x < 0)
-            spriteRend.flipX = true;
-        else if (movement.x > 0)
-            spriteRend.flipX = false;
+       
 
         anim.SetFloat("Horizontal", movement.x);
         anim.SetFloat("Vertical", movement.y);
@@ -84,6 +81,7 @@ public class playerMovement : MonoBehaviour
         }
     }
 
+    #region Dash Functions
     private void Dash(float inputX, float inputY)
     {
         if (Input.GetKeyDown(dashingKey) && _canDash)
@@ -108,4 +106,10 @@ public class playerMovement : MonoBehaviour
         _isDashing = false;
         _canDash = true;
     }
+    #endregion
+
+
+
+
+
 }
