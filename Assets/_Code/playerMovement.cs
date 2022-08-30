@@ -14,9 +14,6 @@ public class PlayerMovement : MonoBehaviour
     Vector2 movement;
 
 
-    [SerializeField] Animator anim;
-    
-    
     [Header("Dash Controls")]
     [SerializeField] private float _dashingVelocity;
     [SerializeField] private float _dashingTime = 0;
@@ -29,28 +26,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] TrailRenderer trailRenderer;
 
 
-    [Header("Other References")]
 
-    public PickUpHandler pickupHandlerInstance;
 
-    private PhotonView photonView;
-
-    private void Start()
-    {
-        pickupHandlerInstance = GetComponent<PickUpHandler>();
-        pickupHandlerInstance.Direction = new Vector2(0, 0);
-
-        photonView = GetComponent<PhotonView>();
-        
-    }
-
-    void Update()
-    {
-        if (photonView.IsMine)
-            Movement();
-    }
-
-    private void Movement()
+    public Vector2 Movement()
     {
         movement.x = Input.GetAxisRaw("Horizontal");
         movement.y = Input.GetAxisRaw("Vertical");
@@ -58,21 +36,15 @@ public class PlayerMovement : MonoBehaviour
         Dash(movement.x, movement.y);
 
 
-        if (movement.sqrMagnitude > 0.1f)
-        {
-            pickupHandlerInstance.Direction = movement.normalized;
-        }
-
-       
-
-        anim.SetFloat("Horizontal", movement.x);
-        anim.SetFloat("Vertical", movement.y);
-        anim.SetFloat("Speed", movement.sqrMagnitude);
+        return movement;
+  
     }
 
-    private void FixedUpdate()
+    #region Dash Functions
+
+    public void MovementFixedUpdateFunction()
     {
-        if(!_isDashing)
+        if (!_isDashing)
             rb.MovePosition(rb.position + movement * moveSpeed * Time.fixedDeltaTime);
         if (_isDashing)
         {
@@ -81,8 +53,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    #region Dash Functions
-    private void Dash(float inputX, float inputY)
+    public void Dash(float inputX, float inputY)
     {
         if (Input.GetKeyDown(dashingKey) && _canDash)
         {

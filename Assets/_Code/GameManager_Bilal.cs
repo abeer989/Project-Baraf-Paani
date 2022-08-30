@@ -48,12 +48,15 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
             DetermineSeeker();
         }
 
+        // run time and check for time
+        // catching mechanic
+
         yield return null;
 
     }
 
 
-
+    
 
     #region MASTERCLIENT FUNCTIONS
     public void DetermineSeeker()
@@ -82,6 +85,19 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
 
     #region Game Start Functions
+
+    public void RPC_Freeze(int viewID)
+    {
+        base.photonView.RPC(nameof(photonManagerInstance.RPC_SetFrozen),RpcTarget.All,viewID);
+    }
+
+    public void FreezeTargetPlayer(int viewID)
+    {
+        var playerManager = spawnPlayersInstance.GetPlayerWithViewId(viewID);
+
+        playerManager.FreezePlayer();
+    }
+
 
     public void SetSeeker(int viewId)
     {

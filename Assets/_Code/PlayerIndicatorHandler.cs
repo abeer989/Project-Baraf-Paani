@@ -22,4 +22,9 @@ public class PlayerIndicatorHandler : MonoBehaviour
         }
     }
 
+    public void SetIndicator()
+    {
+        indicatorSprite.color = Color.black;
+    }
+
 }

@@ -13,4 +13,10 @@ public class GamePhotonManager : MonoBehaviour
     {
         gameManagerInstance.SetSeeker(viewID);
     }
+
+    [PunRPC]
+    public void RPC_SetFrozen(int viewID)
+    {
+        gameManagerInstance.FreezeTargetPlayer(viewID);
+    }
 }
