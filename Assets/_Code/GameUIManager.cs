@@ -10,6 +10,9 @@ public class GameUIManager : MonoBehaviour
 
     [SerializeField] Button startGameBtn;
 
+    [SerializeField] GameObject gameOverPanel;
+    [SerializeField] TextMeshProUGUI WinText;
+
     public System.Action onStartClicked;
 
 
@@ -27,6 +30,16 @@ public class GameUIManager : MonoBehaviour
     public void SetStartBtnInteractibility(bool state)
     {
         startGameBtn.interactable = state;
+    }
+
+    public void SetActiveGameOverPanel(bool state)
+    {
+        gameOverPanel.SetActive(state);
+    }
+
+    public void SetGameOverText(string txt)
+    {
+        WinText.text = txt;
     }
 
 }

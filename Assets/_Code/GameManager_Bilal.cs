@@ -22,6 +22,11 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public GameUIManager uiManagerInstance;
 
 
+    bool isGameActive = false;
+   
+
+
+    bool areAllFrozen = false;
 
     private void Start()
     {
@@ -35,11 +40,15 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     public void StartGame()
     {
-        StartCoroutine(StartGameCoroutine());
+        uiManagerInstance.SetStartBtnInteractibility(false);
+        //StartCoroutine(StartGameCoroutine());
+        base.photonView.RPC(nameof(photonManagerInstance.RPC_StartGame),RpcTarget.All);
     }
 
 
-    IEnumerator StartGameCoroutine()
+
+
+    public IEnumerator StartGameCoroutine()
     {
         Debug.Log("Starting Game...");
 
@@ -48,8 +57,25 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
             DetermineSeeker();
         }
 
+        isGameActive = true;        
         // run time and check for time
         // catching mechanic
+
+        yield return new WaitUntil(CheckIFEveryRunnerIsFrozen);
+
+        isGameActive = false;
+
+        if(areAllFrozen)
+        {
+            uiManagerInstance.SetActiveGameOverPanel(true);
+            uiManagerInstance.SetGameOverText("Seeker Won The Game");
+        }
+        else
+        {
+            uiManagerInstance.SetActiveGameOverPanel(true);
+            uiManagerInstance.SetGameOverText("The runner team has won");
+        }
+        // open ui screen;
 
         yield return null;
 
@@ -61,6 +87,8 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     #region MASTERCLIENT FUNCTIONS
     public void DetermineSeeker()
     {
+
+
         var playersList = spawnPlayersInstance.playersInRoom_List;
 
         Debug.Log($"Players List Gotten -> {playersList.Count}");
@@ -79,7 +107,24 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
+    public bool CheckIFEveryRunnerIsFrozen()
+    {
+        var playerList = spawnPlayersInstance.playersInRoom_List;
 
+        
+
+        for(int i=0; i< playerList.Count;i++)
+        {
+            if(!playerList[i].isSeeker && !playerList[i].isFrozen)
+            {
+                return false;
+            }
+        }
+
+        areAllFrozen = true;
+
+        return true;
+    }
 
     #endregion
 
@@ -91,11 +136,22 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         base.photonView.RPC(nameof(photonManagerInstance.RPC_SetFrozen),RpcTarget.All,viewID);
     }
 
+    public void RPC_UnFreeze(int viewID)
+    {
+        base.photonView.RPC(nameof(photonManagerInstance.RPC_SetUnfrozen), RpcTarget.All, viewID);
+    }
     public void FreezeTargetPlayer(int viewID)
     {
         var playerManager = spawnPlayersInstance.GetPlayerWithViewId(viewID);
 
         playerManager.FreezePlayer();
+    }
+
+    public void UnFreezeTargetPlayer(int viewID)
+    {
+        var playerManager = spawnPlayersInstance.GetPlayerWithViewId(viewID);
+
+        playerManager.UnFreezePlayer();
     }
 
 
@@ -124,6 +180,11 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
             }
         }
 
+    }
+
+    public bool GetGameActiveStatus()
+    {
+        return isGameActive;
     }
 
     #endregion

@@ -43,6 +43,8 @@ MonoBehaviour:
   - SetSeekerIndicator_RPC
   - RPC_SetSeeker
   - RPC_SetFrozen
+  - RPC_SetUnfrozen
+  - RPC_StartGame
   DisableAutoOpenWizard: 1
   ShowSettings: 0
   DevRegionSetOnce: 1

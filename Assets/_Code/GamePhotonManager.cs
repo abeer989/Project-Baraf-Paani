@@ -9,6 +9,12 @@ public class GamePhotonManager : MonoBehaviour
     [SerializeField] GameManager_Bilal gameManagerInstance;
 
     [PunRPC]
+    public void RPC_StartGame()
+    {
+        StartCoroutine(gameManagerInstance.StartGameCoroutine());
+    }
+
+    [PunRPC]
     public void RPC_SetSeeker(int viewID)
     {
         gameManagerInstance.SetSeeker(viewID);
@@ -18,5 +24,11 @@ public class GamePhotonManager : MonoBehaviour
     public void RPC_SetFrozen(int viewID)
     {
         gameManagerInstance.FreezeTargetPlayer(viewID);
+    }
+
+    [PunRPC]
+    public void RPC_SetUnfrozen(int viewID)
+    {
+        gameManagerInstance.UnFreezeTargetPlayer(viewID);
     }
 }

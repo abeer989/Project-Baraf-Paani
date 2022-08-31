@@ -23,7 +23,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     bool isNearTarget;
     PlayerManager targetPlayer;
 
-    bool isFrozen = false;
+    public bool isFrozen = false;
 
     bool m_firstTake = true;
 
@@ -57,23 +57,45 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
             anim.SetFloat("Vertical", movement.y);
             anim.SetFloat("Speed", movement.sqrMagnitude);
 
-            if(Input.GetKeyDown(KeyCode.E) && isNearTarget && isSeeker)
+
+            if(Input.GetKeyDown(KeyCode.E))
             {
-                Debug.Log("Catch");
-                if (targetPlayer)
+                if(!GameManager_Bilal.instance.GetGameActiveStatus())
                 {
-                    //Debug.Log("freezing Player");
-                    //targetPlayer.FreezePlayer();
-                    if(!targetPlayer.isFrozen && !targetPlayer.isSeeker)
-                    {
-                        GameManager_Bilal.instance.RPC_Freeze(targetPlayer.photonView.ViewID);
-                    }
-
-                   
-
+                    return;
                 }
 
+                if(isNearTarget)
+                {
+                    if(isSeeker)
+                    {
+                        Debug.Log("Catch");
+                        if (targetPlayer)
+                        {
+                            //Debug.Log("freezing Player");
+                            //targetPlayer.FreezePlayer();
+                            if (!targetPlayer.isFrozen && !targetPlayer.isSeeker)
+                            {
+                                GameManager_Bilal.instance.RPC_Freeze(targetPlayer.photonView.ViewID);
+                            }
+
+                        }
+                    }
+                    else
+                    {
+                        if(targetPlayer)
+                        {
+                            if(targetPlayer.isFrozen)
+                            {
+                                GameManager_Bilal.instance.RPC_UnFreeze(targetPlayer.photonView.ViewID);
+                            }
+                        }
+
+                    }
+                }
             }
+
+            
 
 
         }
