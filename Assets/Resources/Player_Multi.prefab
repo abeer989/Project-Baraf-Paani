@@ -395,6 +395,7 @@ MonoBehaviour:
   indicatorSprite: {fileID: 8987147178413029920}
   seekerColor: {r: 0.6981132, g: 0.14093982, b: 0.14093982, a: 0.5882353}
   runnerColor: {r: 0.22301528, g: 0.5270912, b: 0.6320754, a: 0.5882353}
+  defaultColor: {r: 0, g: 0, b: 0, a: 0.3137255}
 --- !u!1 &5325149465722871002
 GameObject:
   m_ObjectHideFlags: 0

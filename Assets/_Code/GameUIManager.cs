@@ -10,16 +10,36 @@ public class GameUIManager : MonoBehaviour
 
     [SerializeField] Button startGameBtn;
 
+    [SerializeField] Button leaveBtn;
+
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] TextMeshProUGUI WinText;
 
-    public System.Action onStartClicked;
+    [SerializeField] Button playAgainBtn;
 
+
+    public System.Action onStartClicked;
+    public System.Action onleaveBtnClicked;
+    public System.Action onPlayAgainClicked;
+
+    [Header("Timer UI")]
+    [SerializeField] TextMeshProUGUI timerTxt;
 
     
     private void Start()
     {
-        startGameBtn.onClick.AddListener(delegate { onStartClicked(); });
+        startGameBtn.onClick.AddListener(delegate { onStartClicked?.Invoke(); });
+        playAgainBtn.onClick.AddListener(delegate { onPlayAgainClicked?.Invoke(); });
+    }
+
+    public void SetTimerText(int value)
+    {
+        timerTxt.text = $"Time Left: {value}";
+    }
+
+    public void ResetTimerTxt()
+    {
+        timerTxt.text = $"Time Left: -";
     }
 
     public void SetListOfPlayerText(string txt)

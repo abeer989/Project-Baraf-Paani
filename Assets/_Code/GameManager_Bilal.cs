@@ -20,13 +20,14 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public GamePhotonManager photonManagerInstance;
 
     public GameUIManager uiManagerInstance;
-
+    public TimerHandler gameTimerInstance;
 
     bool isGameActive = false;
    
 
 
     bool areAllFrozen = false;
+    bool isTimeOver = false;
 
     private void Start()
     {
@@ -35,6 +36,8 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         uiManagerInstance.SetStartBtnInteractibility(PhotonNetwork.IsMasterClient); // set interactibility if is master client
 
         uiManagerInstance.onStartClicked = StartGame;
+        gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
+        uiManagerInstance.onPlayAgainClicked = WhenPlayAgain;
 
     }
 
@@ -42,27 +45,32 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     {
         uiManagerInstance.SetStartBtnInteractibility(false);
         //StartCoroutine(StartGameCoroutine());
-        base.photonView.RPC(nameof(photonManagerInstance.RPC_StartGame),RpcTarget.All);
+        base.photonView.RPC(nameof(photonManagerInstance.RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
+        
     }
 
 
 
 
-    public IEnumerator StartGameCoroutine()
+    public IEnumerator StartGameCoroutine(double photonTime)
     {
         Debug.Log("Starting Game...");
+
+        
 
         if(PhotonNetwork.IsMasterClient)
         {
             DetermineSeeker();
         }
 
-        isGameActive = true;        
+        isGameActive = true;
         // run time and check for time
         // catching mechanic
+        gameTimerInstance.InitializeTimer(photonTime);
+        yield return new WaitUntil( ()=> CheckIFEveryRunnerIsFrozen() || isTimeOver);
 
-        yield return new WaitUntil(CheckIFEveryRunnerIsFrozen);
-
+        gameTimerInstance.StopTimer();
+        
         isGameActive = false;
 
         if(areAllFrozen)
@@ -73,7 +81,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         else
         {
             uiManagerInstance.SetActiveGameOverPanel(true);
-            uiManagerInstance.SetGameOverText("The runner team has won");
+            uiManagerInstance.SetGameOverText("Time Over! The runner team has won");
         }
         // open ui screen;
 
@@ -81,8 +89,30 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
-
+    public void WhenTimeOverFunction()
+    {
+        isTimeOver = true;
+        
+    }
     
+    public void WhenPlayAgain()
+    {
+        uiManagerInstance.SetActiveGameOverPanel(false);
+
+        areAllFrozen = false;
+        isTimeOver = false;
+        isGameActive = false;
+
+        foreach(var player in spawnPlayersInstance.playersInRoom_List)
+        {
+            player.ResetPlayerParams();
+        }
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            uiManagerInstance.SetStartBtnInteractibility(true);
+        }
+    }
 
     #region MASTERCLIENT FUNCTIONS
     public void DetermineSeeker()

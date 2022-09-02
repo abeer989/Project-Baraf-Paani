@@ -9,9 +9,9 @@ public class GamePhotonManager : MonoBehaviour
     [SerializeField] GameManager_Bilal gameManagerInstance;
 
     [PunRPC]
-    public void RPC_StartGame()
+    public void RPC_StartGame(double startTime)
     {
-        StartCoroutine(gameManagerInstance.StartGameCoroutine());
+        StartCoroutine(gameManagerInstance.StartGameCoroutine(startTime));
     }
 
     [PunRPC]

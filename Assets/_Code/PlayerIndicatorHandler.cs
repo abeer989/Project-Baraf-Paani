@@ -9,6 +9,7 @@ public class PlayerIndicatorHandler : MonoBehaviour
     [SerializeField] Color seekerColor;
     [SerializeField] Color runnerColor;
 
+    [SerializeField] Color defaultColor;
 
     public void SetIndicator(bool isSeeker)
     {
@@ -22,9 +23,9 @@ public class PlayerIndicatorHandler : MonoBehaviour
         }
     }
 
-    public void SetIndicator()
+    public void ResetIndicator()
     {
-        indicatorSprite.color = Color.black;
+        indicatorSprite.color = defaultColor;
     }
 
 }

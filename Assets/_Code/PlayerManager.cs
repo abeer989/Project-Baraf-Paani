@@ -153,6 +153,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Add(this);
     }
 
+
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
        //if(stream.IsWriting)
@@ -176,5 +178,18 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
        //         UnFreezePlayer();
 
        // }
+    }
+
+    private void OnDestroy()
+    {
+        GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Remove(this);    
+    }
+
+    public void ResetPlayerParams()
+    {
+        indicatorInstance.ResetIndicator();
+        isFrozen = false;
+        isSeeker = false;
+        playerSprite.color = Color.white;
     }
 }
