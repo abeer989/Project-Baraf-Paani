@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
+using System.Linq;
 
 public class SpawnPlayersHandler : MonoBehaviour
 {
@@ -12,10 +13,31 @@ public class SpawnPlayersHandler : MonoBehaviour
     public float minY;
     public float maxY;
 
-    private void Start()
+    public List<PlayerManager> playersInRoom_List;
+
+    public void SpawnPlayers()
     {
         Vector2 randomPosition = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
 
-        PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
+        var GO = PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
+
+        var pm = GO.GetComponent<PlayerManager>();
+
+        //playersInRoom_List.Add(pm);
+
     }
+
+
+
+    public PlayerManager GetPlayerWithViewId(int viewId)
+    {
+        var playerObject = playersInRoom_List.FirstOrDefault(x => x.photonView.ViewID == viewId); ;
+
+        return playerObject;
+    }
+
+
+
+    
+
 }
