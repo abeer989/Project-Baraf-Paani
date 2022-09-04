@@ -1,7 +1,11 @@
+using TMPro;
 using UnityEngine;
 
 public class StateController : MonoBehaviour
 {
+    [SerializeField] GameObject interactionCanvas;
+    [SerializeField] TextMeshProUGUI barafIndicatorText;
+
     bool isBaraf;
     bool barafPossible;
 
@@ -11,9 +15,18 @@ public class StateController : MonoBehaviour
     {
         if (barafPossible)
         {
+            interactionCanvas.SetActive(true);
+
             if (Input.GetKeyDown(KeyCode.E))
+            {
+                barafPossible = false;
+                interactionCanvas.SetActive(false);
                 Baraf();
+            }
         }
+
+        else
+            interactionCanvas.SetActive(false);
     }
 
     private void OnTriggerEnter2D(Collider2D other)

@@ -15,6 +15,7 @@ public class NPCController : MonoBehaviour
     [SerializeField] float waitTime;
 
     Transform jail;
+    [SerializeField] GameObject damageNumbersPrefab;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] StateController state;
 
@@ -22,10 +23,11 @@ public class NPCController : MonoBehaviour
 
     int currentTargetedPoint;
     float waitCounter;
+    bool goToJailCRCalledOnce;
 
     private void OnEnable()
     {
-        //jail = FindObjectOfType<Jail>().transform;
+        jail = FindObjectOfType<Jail>().transform;
         state = GetComponentInChildren<StateController>();
 
         gameObject.name = characterName;
@@ -70,14 +72,18 @@ public class NPCController : MonoBehaviour
 
         else
         {
-            if (transform.position != jail.position)
+            if (transform.position != jail.position && !goToJailCRCalledOnce)
                 StartCoroutine(nameof(GoToJailCR));
         }
     }
 
     IEnumerator GoToJailCR()
     {
-        yield return new WaitForSeconds(.5f);
+        goToJailCRCalledOnce = true;
+
+        GameObject barafIndicator = Instantiate(damageNumbersPrefab, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+
+        yield return new WaitForSeconds(1f);
 
         transform.position = jail.position;
 

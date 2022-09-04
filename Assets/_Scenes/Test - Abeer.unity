@@ -753,6 +753,10 @@ PrefabInstance:
       value: -477140473
       objectReference: {fileID: 0}
     - target: {fileID: 8293935526714860958, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
+      propertyPath: move
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8293935526714860958, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
       propertyPath: sprite
       value: 
       objectReference: {fileID: -850819926, guid: fb8cc55af4b7a034584793949fd90500, type: 3}
@@ -782,7 +786,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &910459046
 Transform:
   m_ObjectHideFlags: 0
@@ -1444,14 +1448,6 @@ PrefabInstance:
     - target: {fileID: 8293935526714860956, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8293935526714860957, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
-      propertyPath: m_SortingLayer
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8293935526714860957, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
-      propertyPath: m_SortingLayerID
-      value: -477140473
       objectReference: {fileID: 0}
     - target: {fileID: 8293935526714860959, guid: 0ceedf20853637f4f8a01e29e563cf53, type: 3}
       propertyPath: m_Name
