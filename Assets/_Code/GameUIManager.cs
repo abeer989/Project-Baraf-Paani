@@ -25,11 +25,21 @@ public class GameUIManager : MonoBehaviour
     [Header("Timer UI")]
     [SerializeField] TextMeshProUGUI timerTxt;
 
+    [SerializeField] TextMeshProUGUI countDownTimerTxt;
+
+
+    [SerializeField] TextMeshProUGUI pingTxt;
     
     private void Start()
     {
         startGameBtn.onClick.AddListener(delegate { onStartClicked?.Invoke(); });
         playAgainBtn.onClick.AddListener(delegate { onPlayAgainClicked?.Invoke(); });
+        leaveBtn.onClick.AddListener(delegate { onleaveBtnClicked?.Invoke(); });
+    }
+
+    public void SetPingTxt(string txt)
+    {
+        pingTxt.text = txt;
     }
 
     public void SetTimerText(int value)
@@ -60,6 +70,11 @@ public class GameUIManager : MonoBehaviour
     public void SetGameOverText(string txt)
     {
         WinText.text = txt;
+    }
+
+    public void SetCoundDownTimerTxt(string txt)
+    {
+        countDownTimerTxt.text = txt;
     }
 
 }

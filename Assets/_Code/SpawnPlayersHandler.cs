@@ -15,9 +15,20 @@ public class SpawnPlayersHandler : MonoBehaviour
 
     public List<PlayerManager> playersInRoom_List;
 
+    [SerializeField] List<Transform> runnerSpawnLocations_List;
+    [SerializeField] List<Transform> seekersSpawnLocations_List;
+
+
+    private HashSet<int> occupeidRunnerLocations;
+    private HashSet<int> occupaiedSeekerLocations;
+    
+
+
     public void SpawnPlayers()
     {
         Vector2 randomPosition = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+
+
 
         var GO = PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
 
@@ -27,6 +38,35 @@ public class SpawnPlayersHandler : MonoBehaviour
 
     }
 
+
+    public void SpawnAllPlayersInGameReadyLocations()
+    {
+        int runnerIndex = 0;
+        int seekerIndex = 0;
+
+        foreach(var player in  playersInRoom_List)
+        {
+            player.LockPlayer();
+
+            if(player.isSeeker)
+            {
+                if (seekerIndex >= seekersSpawnLocations_List.Count)
+                    seekerIndex = 0;
+
+                player.transform.position = seekersSpawnLocations_List[seekerIndex].position;
+                seekerIndex++;
+            }
+            else
+            {
+                if (runnerIndex >= runnerSpawnLocations_List.Count)
+                    runnerIndex = 0;
+
+                player.transform.position = runnerSpawnLocations_List[runnerIndex].position;
+                runnerIndex++;
+
+            }
+        }
+    }
 
 
     public PlayerManager GetPlayerWithViewId(int viewId)

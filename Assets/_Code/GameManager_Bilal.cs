@@ -23,11 +23,21 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public TimerHandler gameTimerInstance;
 
     bool isGameActive = false;
-   
+
+    GameState gameState = GameState.Idle;
 
 
     bool areAllFrozen = false;
     bool isTimeOver = false;
+
+    enum GameState 
+    {
+        Idle,
+        SetUP,
+        SeekerDecided,
+        GameStart,
+        GameEnd,
+    }
 
     private void Start()
     {
@@ -37,16 +47,27 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         uiManagerInstance.onStartClicked = StartGame;
         gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
-        uiManagerInstance.onPlayAgainClicked = WhenPlayAgain;
+        uiManagerInstance.onPlayAgainClicked = PlayAgainEvent;
+        uiManagerInstance.onleaveBtnClicked = LeaveRoom;
+    }
 
+    private void Update()
+    {
+        uiManagerInstance.SetPingTxt( PhotonNetwork.GetPing().ToString());
     }
 
     public void StartGame()
     {
+        
         uiManagerInstance.SetStartBtnInteractibility(false);
         //StartCoroutine(StartGameCoroutine());
-        base.photonView.RPC(nameof(photonManagerInstance.RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
-        
+        base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
+
+        // Close Room when game has started
+        PhotonNetwork.CurrentRoom.IsOpen = false;
+        PhotonNetwork.CurrentRoom.IsVisible = false;
+
+
     }
 
 
@@ -55,25 +76,48 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public IEnumerator StartGameCoroutine(double photonTime)
     {
         Debug.Log("Starting Game...");
+        gameState = GameState.SetUP;
 
-        
 
-        if(PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
-            DetermineSeeker();
+            var vId = DetermineSeeker();
+
+            base.photonView.RPC(nameof(RPC_SetSeekerAndStartGameTimer), RpcTarget.All, vId);
+
+            
+
+
+
         }
 
+
+        yield return new WaitUntil(() => gameState == GameState.SeekerDecided);
+        
+        spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
+
+        yield return StartCoroutine(RoundStartCountDownTimer(photonTime));
+
+
+
+        gameState = GameState.GameStart;
         isGameActive = true;
+
+
+
+        // wait for game start timer
+
         // run time and check for time
         // catching mechanic
         gameTimerInstance.InitializeTimer(photonTime);
         yield return new WaitUntil( ()=> CheckIFEveryRunnerIsFrozen() || isTimeOver);
 
         gameTimerInstance.StopTimer();
-        
+
+        gameState = GameState.GameEnd;
         isGameActive = false;
 
-        if(areAllFrozen)
+        if (areAllFrozen)
         {
             uiManagerInstance.SetActiveGameOverPanel(true);
             uiManagerInstance.SetGameOverText("Seeker Won The Game");
@@ -83,7 +127,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
             uiManagerInstance.SetActiveGameOverPanel(true);
             uiManagerInstance.SetGameOverText("Time Over! The runner team has won");
         }
-        // open ui screen;
+
 
         yield return null;
 
@@ -94,8 +138,10 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         isTimeOver = true;
         
     }
-    
-    public void WhenPlayAgain()
+
+
+    #region OnClickFunctions
+    public void PlayAgainEvent()
     {
         uiManagerInstance.SetActiveGameOverPanel(false);
 
@@ -103,19 +149,22 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         isTimeOver = false;
         isGameActive = false;
 
-        foreach(var player in spawnPlayersInstance.playersInRoom_List)
+        foreach (var player in spawnPlayersInstance.playersInRoom_List)
         {
             player.ResetPlayerParams();
         }
 
-        if(PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.IsMasterClient)
         {
             uiManagerInstance.SetStartBtnInteractibility(true);
         }
     }
+    #endregion
+
+
 
     #region MASTERCLIENT FUNCTIONS
-    public void DetermineSeeker()
+    public int DetermineSeeker()
     {
 
 
@@ -133,7 +182,10 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         Debug.Log($"Seeker Dteremine {playerManager.photonView.ViewID}");
 
-        base.photonView.RPC(nameof(photonManagerInstance.RPC_SetSeeker), RpcTarget.All, playerManager.photonView.ViewID);
+        if (!playerManager)
+            return -1;
+
+        return playerManager.photonView.ViewID;
 
     }
 
@@ -161,29 +213,15 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     #region Game Start Functions
 
-    public void RPC_Freeze(int viewID)
+    void UnlockEveryPlayer()
     {
-        base.photonView.RPC(nameof(photonManagerInstance.RPC_SetFrozen),RpcTarget.All,viewID);
+        foreach (var player in spawnPlayersInstance.playersInRoom_List)
+        {
+            player.UnlockPlayer();
+
+            
+        }
     }
-
-    public void RPC_UnFreeze(int viewID)
-    {
-        base.photonView.RPC(nameof(photonManagerInstance.RPC_SetUnfrozen), RpcTarget.All, viewID);
-    }
-    public void FreezeTargetPlayer(int viewID)
-    {
-        var playerManager = spawnPlayersInstance.GetPlayerWithViewId(viewID);
-
-        playerManager.FreezePlayer();
-    }
-
-    public void UnFreezeTargetPlayer(int viewID)
-    {
-        var playerManager = spawnPlayersInstance.GetPlayerWithViewId(viewID);
-
-        playerManager.UnFreezePlayer();
-    }
-
 
     public void SetSeeker(int viewId)
     {
@@ -210,18 +248,80 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
             }
         }
 
+        gameState = GameState.SeekerDecided;
+
     }
 
+
+
+    #endregion
+
+    #region Utility Functions
     public bool GetGameActiveStatus()
     {
         return isGameActive;
+    }
+
+    IEnumerator RoundStartCountDownTimer(double photonTime)
+    {
+        var oneSecDelay = new WaitForSeconds(1);
+
+        uiManagerInstance.SetCoundDownTimerTxt("Ready!!!!");
+
+        yield return oneSecDelay;
+
+        double timerIncValue = 0.0f;
+        double startTime = photonTime;
+        double timer = 5.0f;
+
+        while(timerIncValue < timer)
+        {
+            timerIncValue = PhotonNetwork.Time - startTime;
+            var t = timer - timerIncValue;
+            uiManagerInstance.SetCoundDownTimerTxt(((int)t).ToString());
+            yield return null;
+        }
+
+        uiManagerInstance.SetCoundDownTimerTxt("START!!!!");
+        UnlockEveryPlayer();
+        yield return oneSecDelay;
+        uiManagerInstance.SetCoundDownTimerTxt("");
+
+
+
+        yield return null;
+
+        
+
     }
 
     #endregion
 
 
 
+    #region Photon Functions
 
+    public void LeaveRoom()
+    {
+        PhotonNetwork.LoadLevel(0);
+    }
+
+    [PunRPC]
+    public void RPC_StartGame(double photonTime)
+    {
+        StartCoroutine( StartGameCoroutine(photonTime));
+    }
+
+    [PunRPC]
+    public void RPC_SetSeekerAndStartGameTimer(int viewId)
+    {
+        SetSeeker(viewId);
+
+        //spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
+
+    }
+
+    #endregion
 
 
 

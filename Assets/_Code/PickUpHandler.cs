@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using Photon.Realtime;
 
 public class PickUpHandler : MonoBehaviour
 {
@@ -10,35 +12,90 @@ public class PickUpHandler : MonoBehaviour
     public Vector3 Direction { get; set; }
     private GameObject itemHolding;
 
-    private void Update()
+    public bool isHoldingItem;
+
+
+    [SerializeField] PhotonView pv;
+    //private void Update()
+    //{
+    //    if(Input.GetKeyDown(KeyCode.E))
+    //    {
+    //        if(itemHolding)
+    //        {
+    //            DropAction();
+    //        }
+    //        else
+    //        {
+    //            PickUpAction();
+    //        }
+    //    }
+    //}
+
+    public GameObject GetHoldingItem()
     {
-        if(Input.GetKeyDown(KeyCode.E))
+        return itemHolding;
+    }
+
+
+    public void PickAndThrowFunction()
+    {
+        if(itemHolding)
         {
-            if(itemHolding)
-            {
-                itemHolding.transform.position = transform.position + Direction;
-                itemHolding.transform.parent = null;
+            DropAction();
+        }
+        else
+        {
+            PickUpAction();
+        }
+    }    
 
-                if (itemHolding.GetComponent<Rigidbody2D>())
-                    itemHolding.GetComponent<Rigidbody2D>().simulated = true;
 
-                itemHolding = null;
-            }
-            else
-            {
-                Collider2D pickupItemColl = Physics2D.OverlapCircle(transform.position + Direction, .4f, pickUpMask);
+    public void DropAction()
+    {
+        //itemHolding.transform.position = transform.position + Direction;
+        //itemHolding.transform.parent = null;
 
-                if(pickupItemColl)
-                {
-                    itemHolding = pickupItemColl.gameObject;
-                    itemHolding.transform.position = holdSpot.position;
-                    itemHolding.transform.parent = transform;
+        //if (itemHolding.GetComponent<PickableItem>())
+        //    itemHolding.GetComponent<PickableItem>().OnDrop();
 
-                    if (itemHolding.GetComponent<Rigidbody2D>())
-                        itemHolding.GetComponent<Rigidbody2D>().simulated = false;
-                }
-            }
+        if(!itemHolding)
+        {
+            return;
+        }
+
+        var p = itemHolding.GetComponent<PickableItem>();
+
+        p.OnDrop(Direction);
+
+
+        itemHolding = null;
+    }
+
+    public void PickUpAction()
+    {
+        Collider2D pickupItemColl = Physics2D.OverlapCircle(transform.position + Direction, .4f, pickUpMask);
+
+        if (pickupItemColl)
+        {
+            var item = pickupItemColl.GetComponentInParent<PickableItem>();
+
+            item.OnPickUp(pv.ViewID, holdSpot.position);
+
+
+            itemHolding = pickupItemColl.gameObject;
+
+            //pv.RPC(nameof(item.OnPickedUp),RpcTarget.All,pv.ViewID,holdSpot.position);
+
+
+            //itemHolding = pickupItemColl.gameObject;
+            //itemHolding.transform.position = holdSpot.position;
+            //itemHolding.transform.parent = transform;
+
+            //if (itemHolding.GetComponent<PickableItem>())
+            //    itemHolding.GetComponent<PickableItem>().OnPickedUp();
         }
     }
+
+    
 
 }

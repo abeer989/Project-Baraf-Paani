@@ -12,8 +12,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     public PlayerCatchingHandler catchingHandlerInstance;
 
     [SerializeField] SpriteRenderer playerSprite;
-
     [SerializeField] Animator anim;
+
 
     public Player photonPlayer;
     public PhotonView photonView;
@@ -24,6 +24,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     PlayerManager targetPlayer;
 
     public bool isFrozen = false;
+
+    private bool isLocked = false;
 
     bool m_firstTake = true;
 
@@ -37,28 +39,32 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
         catchingHandlerInstance.onTriggerEnterEvent = WhenInRange;
         catchingHandlerInstance.onTriggerExitEvent = WhenOutOFRange;
+
+        if(!photonView.IsMine)
+        {
+            Destroy(playerMovementInstance.rb);
+        }
+
     }
 
     private void Update()
     {
         if(photonView.IsMine)
         {
-            if (isFrozen)
+            if (isFrozen || isLocked)
                 return;
 
-             var movement = playerMovementInstance.Movement();
+            var movement = playerMovementInstance.Movement();
 
             if (movement.sqrMagnitude > 0.1f)
             {
                 pickUpHandlerInstance.Direction = movement.normalized;
             }
 
-            anim.SetFloat("Horizontal", movement.x);
-            anim.SetFloat("Vertical", movement.y);
-            anim.SetFloat("Speed", movement.sqrMagnitude);
+            SetAnimation(movement);
 
 
-            if(Input.GetKeyDown(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 if(!GameManager_Bilal.instance.GetGameActiveStatus())
                 {
@@ -76,7 +82,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                             //targetPlayer.FreezePlayer();
                             if (!targetPlayer.isFrozen && !targetPlayer.isSeeker)
                             {
-                                GameManager_Bilal.instance.RPC_Freeze(targetPlayer.photonView.ViewID);
+                                //GameManager_Bilal.instance.RPC_Freeze(targetPlayer.photonView.ViewID);
+                                targetPlayer.FreezePlayer();
                             }
 
                         }
@@ -87,7 +94,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                         {
                             if(targetPlayer.isFrozen)
                             {
-                                GameManager_Bilal.instance.RPC_UnFreeze(targetPlayer.photonView.ViewID);
+                                //GameManager_Bilal.instance.RPC_UnFreeze(targetPlayer.photonView.ViewID);
+                                targetPlayer.UnFreezePlayer();
                             }
                         }
 
@@ -95,7 +103,11 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                 }
             }
 
-            
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                pickUpHandlerInstance.PickAndThrowFunction();
+            }
+
 
 
         }
@@ -103,6 +115,11 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
     private void FixedUpdate()
     {
+        if (!photonView.IsMine )
+            return;
+
+        
+
         playerMovementInstance.MovementFixedUpdateFunction();
     }
 
@@ -111,7 +128,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
 
 
-
+    #region Range Functions
     public void WhenInRange(PlayerManager target)
     {
         if (isNearTarget)
@@ -123,7 +140,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
     public void WhenOutOFRange(PlayerManager target)
     {
-        if(targetPlayer!= target)
+        if (targetPlayer != target)
         {
             return;
         }
@@ -131,60 +148,44 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         targetPlayer = null;
 
     }
+    #endregion
 
+
+    #region Freeze / UnFreeze Function
+    //public void FreezePlayer()
+    //{
+    //    playerSprite.color = Color.blue;
+    //    isFrozen = true;
+    //}
+
+    //public void UnFreezePlayer()
+    //{
+    //    playerSprite.color = Color.white;
+    //    isFrozen = false;
+    //}
 
     public void FreezePlayer()
     {
-        playerSprite.color = Color.blue;
-        isFrozen = true;
+        Debug.Log("FreezingPlayer");
+        photonView.RPC(nameof(RPC_Freeze), RpcTarget.All);
     }
 
     public void UnFreezePlayer()
     {
-        playerSprite.color = Color.white;
-        isFrozen = false;
+        Debug.Log("UnfreezePlayer");
+        photonView.RPC(nameof(RPC_UnFreeze), RpcTarget.All);
     }
+    #endregion
 
-    
 
-    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    #region Utility Functions
+
+    void SetAnimation(Vector2 movement)
     {
-
-        GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Add(this);
+        anim.SetFloat("Horizontal", movement.x);
+        anim.SetFloat("Vertical", movement.y);
+        anim.SetFloat("Speed", movement.sqrMagnitude);
     }
-
-
-
-    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
-    {
-       //if(stream.IsWriting)
-       // {
-       //     Debug.Log("is Writing");
-       //     //stream.SendNextisFrozen);
-       // }
-       //else
-       // {
-       //     Debug.Log("is reading");
-       //     if(this.m_firstTake)
-       //     {
-       //         m_firstTake = false;
-       //     }
-
-       //     isFrozen = (bool)stream.ReceiveNext();
-
-       //     if (isFrozen)
-       //         FreezePlayer();
-       //     else
-       //         UnFreezePlayer();
-
-       // }
-    }
-
-    private void OnDestroy()
-    {
-        GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Remove(this);    
-    }
-
     public void ResetPlayerParams()
     {
         indicatorInstance.ResetIndicator();
@@ -192,4 +193,82 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         isSeeker = false;
         playerSprite.color = Color.white;
     }
+
+    public void LockPlayer()
+    {
+        isLocked = true;
+        SetAnimation(Vector2.zero);
+        playerMovementInstance.StopMovement();
+
+
+    }
+
+    public void UnlockPlayer()
+    {
+        isLocked = false;
+    }
+    #endregion
+
+
+
+
+    #region Photon Phunctions
+
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+
+        GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Add(this);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+       // throw new System.NotImplementedException();
+    }
+
+    [PunRPC]
+    private void RPC_Freeze()
+    {
+
+        Debug.Log($"{photonView.ViewID} Freezing me");
+
+       
+
+        playerSprite.color = Color.blue;
+        isFrozen = true;
+        SetAnimation(Vector2.zero);
+        playerMovementInstance.StopMovement();
+
+    }
+
+
+
+    [PunRPC]
+    private void RPC_UnFreeze()
+    {
+        Debug.Log($"{photonView.ViewID} UN Freezing me");
+
+        if (!photonView.IsMine)
+            return;
+
+        playerSprite.color = Color.white;
+        isFrozen = false;
+        
+
+    }
+
+
+    #endregion
+
+
+
+
+    
+
+
+    private void OnDestroy()
+    {
+        GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Remove(this);    
+    }
+
+    
 }

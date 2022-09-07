@@ -48,7 +48,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 1
+  m_Radius: 0.75
 --- !u!114 &7139226100862111805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -294,6 +294,8 @@ MonoBehaviour:
   pickUpMask:
     serializedVersion: 2
     m_Bits: 64
+  isHoldingItem: 0
+  pv: {fileID: 6179443722142164363}
 --- !u!114 &3624249202781090327
 MonoBehaviour:
   m_ObjectHideFlags: 0

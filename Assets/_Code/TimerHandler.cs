@@ -53,7 +53,7 @@ public class TimerHandler : MonoBehaviour
 
         var t = timer - timerIncrementValue;
 
-        Debug.Log($"Time-> {t} = {timer} - {timerIncrementValue}");
+       
 
         GameManager_Bilal.instance.uiManagerInstance.SetTimerText((int)t);
 

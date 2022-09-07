@@ -70,6 +70,10 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void StopMovement()
+    {
+        movement = Vector2.zero;
+    }
     private IEnumerator StopDashingCoroutine()
     {
         yield return new WaitForSeconds(_dashingTime);
