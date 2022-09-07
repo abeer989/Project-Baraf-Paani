@@ -6,11 +6,16 @@ using Photon.Realtime;
 
 public class PickUpHandler : MonoBehaviour
 {
-    public Transform holdSpot;
-    public LayerMask pickUpMask;
-
     public Vector3 Direction { get; set; }
-    private GameObject itemHolding;
+
+    [SerializeField] Transform holdSpot;
+    [SerializeField] LayerMask pickUpMask;
+
+    [Space]
+    [SerializeField] float throwSpeed;
+
+    GameObject itemHolding;
+    
 
     public bool isHoldingItem;
 
