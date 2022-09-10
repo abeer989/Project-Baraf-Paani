@@ -79,12 +79,6 @@ public class PlayerController : MonoBehaviour
         float horizontalMovement = Input.GetAxisRaw(horizontalAxis);
         float verticalMovement = Input.GetAxisRaw(verticalAxis);
 
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            pivot.SetActive(!pivot.activeInHierarchy);
-            freezeShotController.enabled = !freezeShotController.enabled;
-        }
-
         if (canMove)
         {
             //--> Dashing:
@@ -153,6 +147,12 @@ public class PlayerController : MonoBehaviour
     /// </summary>
     /// <param name="_boundsBox"></param>
     public void SetBounds(BoxCollider2D _boundsBox) => playerBoundsBox = _boundsBox;
+
+    public void ToggleFreezeShot(bool state)
+    {
+        pivot.SetActive(state);
+        freezeShotController.enabled = state;
+    }
 
     void ShowAfterImage()
     {

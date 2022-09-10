@@ -4,6 +4,7 @@ using System.Collections;
 
 public class CountdownManager : MonoBehaviour
 {
+    [SerializeField] GameObject gameOverScreen;
     [SerializeField] TextMeshProUGUI timeText;
     [SerializeField] float defaultTimeValue;
 
@@ -22,6 +23,7 @@ public class CountdownManager : MonoBehaviour
             yield return null;
         } while (timer > 0);
 
+        gameOverScreen.SetActive(true);
         Debug.LogError("GAME OVER!"); // GAME OVER LOGIC
         Time.timeScale = 0;
     }

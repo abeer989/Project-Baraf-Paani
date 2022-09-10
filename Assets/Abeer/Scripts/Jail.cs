@@ -1,18 +1,48 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Jail : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static Jail instance;
+
+    [SerializeField] float range;
+
+    Transform player;
+    bool runnerInRange;
+
+    public bool RunnerInRange { get { return runnerInRange; } }
+
+    private void Awake()
     {
-        
+        if (instance == null)
+            instance = this;
+
+        else
+        {
+            Destroy(instance.gameObject);
+            instance = this;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnEnable() => player = PlayerController.instance.transform;
+
+    private void Update()
     {
-        
+        if (player == null)
+            player = FindObjectOfType<PlayerController>().transform;
+
+        else
+        {
+            if (Vector2.Distance(transform.position, player.transform.position) < range)
+                runnerInRange = true;
+
+            else
+                runnerInRange = false;
+        }
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, range);
     }
 }
