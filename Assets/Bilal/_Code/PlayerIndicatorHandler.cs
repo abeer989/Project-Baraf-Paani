@@ -4,12 +4,27 @@ using UnityEngine;
 
 public class PlayerIndicatorHandler : MonoBehaviour
 {
+
+    [Header("Player seeker/Runner Indicator")]
+
     [SerializeField] SpriteRenderer indicatorSprite;
 
     [SerializeField] Color seekerColor;
     [SerializeField] Color runnerColor;
 
     [SerializeField] Color defaultColor;
+
+
+    [Header("Player Local Indicator")]
+    [SerializeField] GameObject localIndicator;
+
+    [Header("Player Action Indicator")]
+    [SerializeField] GameObject actionIndicator;
+
+
+    [Header("Player IceBruf Indicator")]
+    [SerializeField] GameObject brufIndicator;
+
 
     public void SetIndicator(bool isSeeker)
     {
@@ -28,4 +43,22 @@ public class PlayerIndicatorHandler : MonoBehaviour
         indicatorSprite.color = defaultColor;
     }
 
+
+
+    public void SetActiveLocalIndicator(bool state)
+    {
+        localIndicator.SetActive(state);
+    }
+
+
+    public void SetACtiveActionIndicator(bool state)
+    {
+        actionIndicator.SetActive(state);
+    }
+
+
+    public void SetActiveBrufIndicator(bool state)
+    {
+        brufIndicator.SetActive(state);
+    }
 }

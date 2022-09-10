@@ -53,6 +53,8 @@ MonoBehaviour:
   - OnPickedUp
   - RPC_OnDrop
   - RPC_OnPickedUp
+  - RPC_FireIceBall
+  - RPC_OnThrow
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

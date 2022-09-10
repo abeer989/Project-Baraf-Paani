@@ -10,6 +10,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     public PlayerIndicatorHandler indicatorInstance;
     public PickUpHandler pickUpHandlerInstance;
     public PlayerCatchingHandler catchingHandlerInstance;
+    public PlayerStaminaHandler staminaHandlerInstance;
+    public PlayerFreezeShotController freezeShotControllerInstance;
 
     [SerializeField] SpriteRenderer playerSprite;
     [SerializeField] Animator anim;
@@ -29,8 +31,21 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
     bool m_firstTake = true;
 
+
+    Vector2 updatedMovement;
+
+    Vector2 networkPos;
+
+
+    
+
+    
+
     private void Start()
     {
+        
+
+
         if (!photonView)
             photonView = GetComponent<PhotonView>();
 
@@ -40,21 +55,47 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         catchingHandlerInstance.onTriggerEnterEvent = WhenInRange;
         catchingHandlerInstance.onTriggerExitEvent = WhenOutOFRange;
 
-        if(!photonView.IsMine)
+        if (!photonView.IsMine)
         {
             Destroy(playerMovementInstance.rb);
+            
+        }
+        else
+        {
+           
+            indicatorInstance.SetActiveLocalIndicator(true);
         }
 
     }
 
+    
+    
     private void Update()
     {
+
+        if (!photonView.IsMine)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, networkPos, Time.deltaTime * playerMovementInstance.moveSpeed);
+
+            return;
+        }
+
+
+        Vector2 oldPosition = transform.position;
+
         if(photonView.IsMine)
         {
             if (isFrozen || isLocked)
                 return;
 
-            var movement = playerMovementInstance.Movement();
+            bool isDashing = false;
+
+            if(Input.GetKeyDown(playerMovementInstance.DashingKey))
+            {
+                isDashing =  staminaHandlerInstance.UseStamina(40);
+            }
+
+            var movement = playerMovementInstance.Movement(isDashing);
 
             if (movement.sqrMagnitude > 0.1f)
             {
@@ -66,14 +107,14 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                if(!GameManager_Bilal.instance.GetGameActiveStatus())
-                {
-                    return;
-                }
+                //if (!GameManager_Bilal.instance.GetGameActiveStatus())
+                //{
+                //    return;
+                //}
 
-                if(isNearTarget)
+                if (isNearTarget)
                 {
-                    if(isSeeker)
+                    if (isSeeker)
                     {
                         Debug.Log("Catch");
                         if (targetPlayer)
@@ -90,9 +131,9 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                     }
                     else
                     {
-                        if(targetPlayer)
+                        if (targetPlayer)
                         {
-                            if(targetPlayer.isFrozen)
+                            if (targetPlayer.isFrozen)
                             {
                                 //GameManager_Bilal.instance.RPC_UnFreeze(targetPlayer.photonView.ViewID);
                                 targetPlayer.UnFreezePlayer();
@@ -100,6 +141,15 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                         }
 
                     }
+                }
+                else
+                {
+                    //freezeShotControllerInstance.FireIceBall(movement,photonView.ViewID);
+                    photonView.RPC(
+                        nameof(freezeShotControllerInstance.RPC_FireIceBall),
+                        RpcTarget.All,movement,
+                        photonView.ViewID
+                        );
                 }
             }
 
@@ -111,6 +161,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
 
         }
+
+        updatedMovement = (Vector2)transform.position - oldPosition;
     }
 
     private void FixedUpdate()
@@ -131,8 +183,18 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     #region Range Functions
     public void WhenInRange(PlayerManager target)
     {
+
+        if (!photonView.IsMine) return;
+
         if (isNearTarget)
             return;
+
+        target.indicatorInstance.SetACtiveActionIndicator(true);
+
+        //if (isSeeker && !target.isSeeker || !isSeeker && target.isFrozen)
+        //{
+        //    target.SetActiveActionIndicator(true);
+        //}
 
         isNearTarget = true;
         targetPlayer = target;
@@ -140,15 +202,25 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
     public void WhenOutOFRange(PlayerManager target)
     {
+        if (!photonView.IsMine) return;
+
         if (targetPlayer != target)
         {
             return;
         }
+
+        target.indicatorInstance.SetACtiveActionIndicator(false);
+
         isNearTarget = false;
         targetPlayer = null;
 
     }
+
+   
+
     #endregion
+
+    
 
 
     #region Freeze / UnFreeze Function
@@ -220,9 +292,41 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Add(this);
     }
 
+   
+
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
     {
-       // throw new System.NotImplementedException();
+        if (stream.IsWriting)
+        {
+            stream.SendNext((Vector2)transform.position);
+            stream.SendNext(updatedMovement);
+        }
+        else
+        {
+            networkPos = (Vector2)stream.ReceiveNext();
+            updatedMovement = (Vector2)stream.ReceiveNext();
+
+            float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+            networkPos += (updatedMovement * lag);
+
+        }
+
+
+        //if(stream.IsWriting)
+        //{
+        //    stream.SendNext(playerMovementInstance.rb.position);
+        //    stream.SendNext(playerMovementInstance.rb.rotation);
+        //    stream.SendNext(playerMovementInstance.rb.velocity);
+        //}
+        //else
+        //{
+        //    playerMovementInstance.rb.position = (Vector2) stream.ReceiveNext();
+        //    playerMovementInstance.rb.rotation = (float)stream.ReceiveNext();
+        //    playerMovementInstance.rb.velocity = (Vector2)stream.ReceiveNext();
+        //}
+        //// throw new System.NotImplementedException();
+        //float lag = Mathf.Abs((float)(PhotonNetwork.Time - info.SentServerTime));
+        //playerMovementInstance.rb.position += playerMovementInstance.rb.velocity * lag;
     }
 
     [PunRPC]
@@ -237,6 +341,9 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         isFrozen = true;
         SetAnimation(Vector2.zero);
         playerMovementInstance.StopMovement();
+        indicatorInstance.SetActiveBrufIndicator(true);
+        
+        
 
     }
 
@@ -252,7 +359,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
         playerSprite.color = Color.white;
         isFrozen = false;
-        
+        indicatorInstance.SetActiveBrufIndicator(false);
 
     }
 

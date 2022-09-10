@@ -47,6 +47,7 @@ public class PickUpHandler : MonoBehaviour
         if(itemHolding)
         {
             DropAction();
+            //ThrowAction();
         }
         else
         {
@@ -70,11 +71,31 @@ public class PickUpHandler : MonoBehaviour
 
         var p = itemHolding.GetComponent<PickableItem>();
 
-        p.OnDrop(Direction);
+        p.OnDrop(transform.position + Direction);
 
 
         itemHolding = null;
     }
+
+    public void ThrowAction()
+    {
+
+        Debug.Log($"Throw Direction = {transform.position} | {Direction}");
+
+        if (!itemHolding)
+        {
+            return;
+        }
+
+        var p = itemHolding.GetComponent<PickableItem>();
+
+        p.OnThrow((Direction*2));
+
+
+        itemHolding = null;
+    }
+
+
 
     public void PickUpAction()
     {
