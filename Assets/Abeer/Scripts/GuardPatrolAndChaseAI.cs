@@ -1,51 +1,37 @@
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 
-public class NPCController : MonoBehaviour
+public class GuardPatrolAndChaseAI : MonoBehaviour
 {
     [SerializeField] Sprite sprite;
     [SerializeField] List<Transform> movePoints;
 
     [Space]
-    [SerializeField] string characterName;
-
-    [Space]
     [SerializeField] float moveSpeed;
     [SerializeField] float waitTime;
 
-    [SerializeField] GameObject damageNumbersPrefab;
-    [SerializeField] SpriteRenderer spriteRenderer;
-    [SerializeField] StateController state;
-
-    [SerializeField] bool move;
-
-    Transform jail;
+    SpriteRenderer spriteRenderer;
 
     int currentTargetedPoint;
     float waitCounter;
-    bool goToJailCRCalledOnce;
+    bool move;
 
     private void OnEnable()
     {
-        jail = FindObjectOfType<Jail>().transform;
-        state = GetComponentInChildren<StateController>();
-
-        gameObject.name = characterName;
         spriteRenderer = GetComponent<SpriteRenderer>();
-        if (spriteRenderer)
+
+        if (spriteRenderer && sprite)
             spriteRenderer.sprite = sprite;
 
         movePoints[0].parent.name = gameObject.name + "'s MovePoints";
         movePoints[0].parent.SetParent(null);
 
-        currentTargetedPoint = 0;
-        waitCounter = waitTime;
+        move = true;
     }
 
     private void Update()
     {
-        if (!state.IsBaraf)
+        if (!Jail.instance.RunnerInRange)
         {
             if (move)
             {
@@ -67,27 +53,21 @@ public class NPCController : MonoBehaviour
                             waitCounter = waitTime;
                         }
                     }
-                }  
-            }
+                }
+            } 
         }
 
         else
         {
-            if (transform.position != jail.position && !goToJailCRCalledOnce)
-                StartCoroutine(nameof(GoToJailCR));
+            if (PlayerController.instance != null)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, PlayerController.instance.transform.position, moveSpeed * Time.deltaTime);
+
+                if (Vector2.Distance(transform.position, PlayerController.instance.transform.position) < 0.2f)
+                {
+                    Debug.Log("seeker caught");
+                }
+            }
         }
-    }
-
-    IEnumerator GoToJailCR()
-    {
-        goToJailCRCalledOnce = true;
-
-        GameObject barafIndicator = Instantiate(damageNumbersPrefab, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
-
-        yield return new WaitForSeconds(1f);
-
-        transform.position = jail.position;
-
-        yield break;
     }
 }

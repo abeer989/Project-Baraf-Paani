@@ -23,8 +23,8 @@ public class FreezeShotController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-
             Instantiate(iceBallPrefab, firePoint.position, Quaternion.identity).moveDir = direction;
+            PlayerController.instance.ToggleFreezeShot(false);
         }
     }
 }
