@@ -143,7 +143,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.8
+  m_Radius: 0.6
 --- !u!114 &1545191305933811223
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,7 +157,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionCanvas: {fileID: 7679001980851692067}
-  barafIndicatorText: {fileID: 0}
 --- !u!1 &8293935526714860959
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,7 +283,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.75, y: 1}
+  m_Size: {x: 0.9, y: 1.03}
   m_Direction: 0
 --- !u!1001 &8293935527510576059
 PrefabInstance:

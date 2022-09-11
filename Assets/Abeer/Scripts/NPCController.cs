@@ -20,7 +20,7 @@ public class NPCController : MonoBehaviour
 
     [SerializeField] bool move;
 
-    Transform jail;
+    Jail jail;
 
     int currentTargetedPoint;
     float waitCounter;
@@ -28,7 +28,7 @@ public class NPCController : MonoBehaviour
 
     private void OnEnable()
     {
-        jail = FindObjectOfType<Jail>().transform;
+        jail = FindObjectOfType<Jail>();
         state = GetComponentInChildren<StateController>();
 
         gameObject.name = characterName;
@@ -73,7 +73,7 @@ public class NPCController : MonoBehaviour
 
         else
         {
-            if (transform.position != jail.position && !goToJailCRCalledOnce)
+            if (!goToJailCRCalledOnce)
                 StartCoroutine(nameof(GoToJailCR));
         }
     }
@@ -82,12 +82,25 @@ public class NPCController : MonoBehaviour
     {
         goToJailCRCalledOnce = true;
 
-        GameObject barafIndicator = Instantiate(damageNumbersPrefab, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+        Instantiate(damageNumbersPrefab, transform.position + new Vector3(0, 1, 0), Quaternion.identity);
 
         yield return new WaitForSeconds(1f);
 
-        transform.position = jail.position;
+        int rand = Random.Range(0, jail.jailPoints.Count);
+
+        int whileBreaker = 0;
+        while (jail.jailPoints[rand].isOccupied && whileBreaker < 50)
+        {
+            rand = Random.Range(0, jail.jailPoints.Count);
+            whileBreaker++;
+        }
+
+        JailPoint jp = jail.jailPoints[rand];
+        transform.position = jp.transform.position;
+        jp.isOccupied = true;
 
         yield break;
     }
+
+    public void JailCRBoolOff() => goToJailCRCalledOnce = false;
 }

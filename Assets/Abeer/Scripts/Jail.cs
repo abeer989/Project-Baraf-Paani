@@ -1,9 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Jail : MonoBehaviour
 {
     public static Jail instance;
 
+    public List<JailPoint> jailPoints;
+
+    [Space]
     [SerializeField] float range;
 
     Transform player;
