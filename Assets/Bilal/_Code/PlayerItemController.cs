@@ -23,6 +23,8 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
     public Sprite[] avatars;
 
 
+    string playerAvatarKey = "playerAvatar";
+
     Player player;
 
     private void Start()
@@ -57,13 +59,13 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     public void OnClickLeftArrow()
     {
-        if((int)playerProps["playerAvatar"] == 0)
+        if((int)playerProps[playerAvatarKey] == 0)
         {
-            playerProps["playerAvatar"] = avatars.Length - 1;
+            playerProps[playerAvatarKey] = avatars.Length - 1;
         }
         else
         {
-            playerProps["playerAvatar"] = (int)playerProps["playerAvatar"] - 1;
+            playerProps[playerAvatarKey] = (int)playerProps[playerAvatarKey] - 1;
         }
 
         PhotonNetwork.SetPlayerCustomProperties(playerProps);
@@ -72,13 +74,13 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     public void OnClickRightArrow()
     {
-        if ((int)playerProps["playerAvatar"] == avatars.Length-1)
+        if ((int)playerProps[playerAvatarKey] == avatars.Length-1)
         {
-            playerProps["playerAvatar"] = 0;
+            playerProps[playerAvatarKey] = 0;
         }
         else
         {
-            playerProps["playerAvatar"] = (int)playerProps["playerAvatar"] + 1;
+            playerProps[playerAvatarKey] = (int)playerProps[playerAvatarKey] + 1;
         }
 
         PhotonNetwork.SetPlayerCustomProperties(playerProps);
@@ -87,11 +89,17 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     void UpdatePlayerItem(Player player)
     {
-        if(player.CustomProperties.ContainsKey("playerAvatar"))
+        if(player.CustomProperties.ContainsKey(playerAvatarKey))
         {
-            int index = (int)player.CustomProperties["playerAvatar"];
-
+            int index = (int)player.CustomProperties[playerAvatarKey];
             img_PlayerAvatar.sprite = avatars[index];
+            
+            playerProps[playerAvatarKey] = index;
+        }
+        else
+        {
+            playerProps[playerAvatarKey] = 0;
+            
         }
     }
 
@@ -101,12 +109,9 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
        if(player == targetPlayer)
         {
             UpdatePlayerItem(player);
-            playerProps["playerAvatar"] = (int)player.CustomProperties["playerAvatar"];
+           // playerProps[playerAvatarKey] = (int)player.CustomProperties[playerAvatarKey];
         }
-       else
-        {
-            playerProps["playerAVatar"] = 0;
-        }
+       
     }
 
 

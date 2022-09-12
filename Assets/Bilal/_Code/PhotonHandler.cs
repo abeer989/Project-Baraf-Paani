@@ -23,6 +23,7 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
 
         if(Application.internetReachability != NetworkReachability.NotReachable)
         {
+            PhotonNetwork.AutomaticallySyncScene = true;
             PhotonNetwork.ConnectUsingSettings();
 
         }
