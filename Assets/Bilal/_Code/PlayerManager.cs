@@ -12,6 +12,8 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     public PlayerCatchingHandler catchingHandlerInstance;
     public PlayerStaminaHandler staminaHandlerInstance;
     public PlayerFreezeShotController freezeShotControllerInstance;
+    public PlayerPowerUpHandler powerUpHandlerInstance;
+
 
     [SerializeField] SpriteRenderer playerSprite;
     [SerializeField] Animator anim;
@@ -37,9 +39,9 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     Vector2 networkPos;
 
 
-    
 
-    
+    bool isIceGunActive = false;
+    bool isInvincible = false;
 
     private void Start()
     {
@@ -54,6 +56,10 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
         catchingHandlerInstance.onTriggerEnterEvent = WhenInRange;
         catchingHandlerInstance.onTriggerExitEvent = WhenOutOFRange;
+
+        powerUpHandlerInstance.onIceGunActive = ActivateIceGun;
+
+        powerUpHandlerInstance.onInvincActive = ActivateInvincibility;
 
         if (!photonView.IsMine)
         {
@@ -144,12 +150,18 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
                 }
                 else
                 {
+                    if(isIceGunActive)
+                    {
+                        photonView.RPC(
+                       nameof(freezeShotControllerInstance.RPC_FireIceBall),
+                       RpcTarget.All, movement,
+                       photonView.ViewID
+                       );
+                    }
+                        
+
                     //freezeShotControllerInstance.FireIceBall(movement,photonView.ViewID);
-                    photonView.RPC(
-                        nameof(freezeShotControllerInstance.RPC_FireIceBall),
-                        RpcTarget.All,movement,
-                        photonView.ViewID
-                        );
+                   
                 }
             }
 
@@ -281,7 +293,42 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     }
     #endregion
 
+    #region PowerUpFunctions
 
+    public void ActivateIceGun()
+    {
+        if (isIceGunActive)
+            return;
+
+        isIceGunActive = true;
+        StartCoroutine(powerUpHandlerInstance.PowerCountDown(StopIceGun));
+    }
+
+    public void StopIceGun()
+    {
+        isIceGunActive = false;
+    }
+
+    public void ActivateInvincibility()
+    {
+      
+       StartCoroutine(powerUpHandlerInstance.PowerCountDown(StopInvincibility));
+       
+
+       Debug.Log("Active Invincibiltiy");
+
+       photonView.RPC(nameof(RPC_NotifyInvincible), RpcTarget.All, true);
+
+    }
+
+    public void StopInvincibility()
+    {
+        Debug.Log("Active Invincibiltiy");
+
+        photonView.RPC(nameof(RPC_NotifyInvincible), RpcTarget.All, false) ;
+    }
+
+    #endregion
 
 
     #region Photon Phunctions
@@ -329,9 +376,25 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         //playerMovementInstance.rb.position += playerMovementInstance.rb.velocity * lag;
     }
 
+
+    [PunRPC]
+    private void RPC_NotifyInvincible(bool state)
+    {
+        Debug.Log($"Is invincible = {state}");
+        isInvincible = state;
+        
+      
+
+
+    }
+
+
     [PunRPC]
     private void RPC_Freeze()
     {
+        if (isInvincible)
+            return;
+        
 
         Debug.Log($"{photonView.ViewID} Freezing me");
 

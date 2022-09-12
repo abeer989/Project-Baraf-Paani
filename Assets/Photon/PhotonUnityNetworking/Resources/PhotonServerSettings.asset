@@ -55,6 +55,8 @@ MonoBehaviour:
   - RPC_OnPickedUp
   - RPC_FireIceBall
   - RPC_OnThrow
+  - RPC_NotifyInvincible
+  - RPC_SetActivateObject
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1
