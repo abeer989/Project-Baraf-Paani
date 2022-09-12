@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 
+
+
+
 public class PhotonHandler : MonoBehaviourPunCallbacks
 {
     public LobbyUIManager lobbyUImanagerInstance;
 
     public int levelToLoadIndex;
+
+   
+
 
     private void Start()
     {
@@ -64,6 +70,10 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
             return;
 
+        if (!lobbyUImanagerInstance.ValidateName())
+            return;
+
+        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
         PhotonNetwork.JoinRoom(lobbyUImanagerInstance.GetRoomName());
 
         Debug.Log("Joining Room");
@@ -76,6 +86,12 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
             return;
 
-        PhotonNetwork.CreateRoom(lobbyUImanagerInstance.GetRoomName());
+        if (!lobbyUImanagerInstance.ValidateName())
+            return;
+
+        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
+
+        PhotonNetwork.CreateRoom(lobbyUImanagerInstance.GetRoomName(),
+            new Photon.Realtime.RoomOptions() { MaxPlayers = 5, BroadcastPropsChangeToAll = true});
     }
 }

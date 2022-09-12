@@ -10,6 +10,7 @@ public class LobbyUIManager : MonoBehaviour
 
 
     [SerializeField] TMP_InputField roomNameIF;
+    [SerializeField] TMP_InputField playerNameIF;
     [SerializeField] Button createBtn;
     [SerializeField] Button joinBtn;
 
@@ -30,8 +31,24 @@ public class LobbyUIManager : MonoBehaviour
         return roomNameIF.text;
     }
 
+    public string GetPlayerName()
+    {
+        return playerNameIF.text;
+    }
+
     public void SetActiveLoadingPanel(bool state)
     {
         loadingPnlGO.SetActive(state);
     }
+
+    public bool ValidateName()
+    {
+        if(string.IsNullOrEmpty( playerNameIF.text))
+        {
+            return false;
+        }
+
+        return true;
+    }
+    
 }
