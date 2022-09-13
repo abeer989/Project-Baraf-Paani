@@ -6,12 +6,20 @@ using System.Linq;
 
 public class SpawnPlayersHandler : MonoBehaviour
 {
-    public GameObject playerPrefab;
+    public GameObject[] playerPrefabs;
 
-    public float minX;
-    public float maxX;
-    public float minY;
-    public float maxY;
+
+    [SerializeField]float rMinX;
+    [SerializeField]float rMaxX;
+    [SerializeField]float rMinY;
+    [SerializeField]float rMaxY;
+
+
+
+    [SerializeField] float sMinX;
+    [SerializeField] float sMaxX;
+    [SerializeField] float sMinY;
+    [SerializeField] float sMaxY;
 
     public List<PlayerManager> playersInRoom_List;
 
@@ -26,15 +34,37 @@ public class SpawnPlayersHandler : MonoBehaviour
 
     public void SpawnPlayers()
     {
-        Vector2 randomPosition = new Vector2(Random.Range(minX, maxX), Random.Range(minY, maxY));
+        bool isSeeker = (bool)PhotonNetwork.LocalPlayer.CustomProperties["isSeeker"];
+
+        Debug.Log($" isSeeker = {isSeeker}");
+
+        Vector2 randomPosition = Vector2.zero;
+
+        if (isSeeker)
+        {
+            randomPosition = new Vector2(Random.Range(rMinX, rMaxX), Random.Range(rMinY, rMaxY));
+
+        }
+        else
+        {
+            randomPosition = new Vector2(Random.Range(sMinX, sMaxX), Random.Range(sMinY, sMaxY));
+        }
+
+        int index = (int)PhotonNetwork.LocalPlayer.CustomProperties["playerAvatar"];
+
+        Debug.Log(" Player AVatar Int "+index);
 
 
+        GameObject playerTypeToSpawn = playerPrefabs[index];
 
-        var GO = PhotonNetwork.Instantiate(playerPrefab.name, randomPosition, Quaternion.identity);
+        var GO = PhotonNetwork.Instantiate(playerTypeToSpawn.name, randomPosition, Quaternion.identity);
+
+
 
         var pm = GO.GetComponent<PlayerManager>();
-
-        //playersInRoom_List.Add(pm);
+        pm.isSeeker = isSeeker;
+        pm.LockPlayer();
+        playersInRoom_List.Add(pm);
 
     }
 

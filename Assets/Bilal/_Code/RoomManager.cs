@@ -18,7 +18,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        hash["isSeeker"] = false;
+        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+
         UpdatePlayerList();
+
+
 
         playButton.onClick.AddListener(OnClickPlayEvent);
     }
@@ -35,8 +42,40 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
     }
 
+    public void DetermineSeeker()
+    {
+
+
+        var playersList = playerItemList;
+
+        Debug.Log($"Players List Gotten -> {playersList.Count}");
+
+        var seekerIndex = Random.Range(0, playersList.Count);
+
+        Debug.Log($"Seeker Index -> {seekerIndex}");
+
+        var playerItem = playersList[seekerIndex];
+
+        Debug.Log($"playerManager Found -> {playerItem}");
+
+        //Debug.Log($"Seeker Dteremine {playerItem.photonView.ViewID}");
+
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        hash["isSeeker"] = true;
+
+        playerItem.player.SetCustomProperties(hash);
+
+    }
+
     public void OnClickPlayEvent()
     {
+         DetermineSeeker();
+
+
+
+       
+
+
         PhotonNetwork.LoadLevel(2); // open game scene
     }
 

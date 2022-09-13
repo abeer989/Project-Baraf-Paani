@@ -25,7 +25,7 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     string playerAvatarKey = "playerAvatar";
 
-    Player player;
+    public Player player;
 
     private void Start()
     {
@@ -48,6 +48,7 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
         player = _player;
         SetNameText(_player.NickName);
         UpdatePlayerItem(player);
+        PhotonNetwork.SetPlayerCustomProperties(playerProps);
     }
 
     public void ApplyLocalChanges()
@@ -59,6 +60,9 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     public void OnClickLeftArrow()
     {
+
+        Debug.Log(" OnClickLeftArrow()");
+
         if((int)playerProps[playerAvatarKey] == 0)
         {
             playerProps[playerAvatarKey] = avatars.Length - 1;
@@ -68,12 +72,15 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
             playerProps[playerAvatarKey] = (int)playerProps[playerAvatarKey] - 1;
         }
 
-        PhotonNetwork.SetPlayerCustomProperties(playerProps);
+       PhotonNetwork.SetPlayerCustomProperties(playerProps);
 
     }
 
     public void OnClickRightArrow()
     {
+
+        Debug.Log("OnClickRightArrow() ");
+
         if ((int)playerProps[playerAvatarKey] == avatars.Length-1)
         {
             playerProps[playerAvatarKey] = 0;
@@ -101,17 +108,26 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
             playerProps[playerAvatarKey] = 0;
             
         }
+        //PhotonNetwork.SetPlayerCustomProperties(playerProps);
     }
 
 
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
-       if(player == targetPlayer)
+        if(changedProps.ContainsKey("playerAvatar"))
         {
-            UpdatePlayerItem(player);
-           // playerProps[playerAvatarKey] = (int)player.CustomProperties[playerAvatarKey];
+            if (player == targetPlayer)
+            {
+                UpdatePlayerItem(player);
+                // playerProps[playerAvatarKey] = (int)player.CustomProperties[playerAvatarKey];
+            }
+
         }
-       
+
+        
+
+
+
     }
 
 

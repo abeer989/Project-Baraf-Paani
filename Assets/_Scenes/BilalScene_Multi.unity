@@ -2827,11 +2827,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 375a5751ba498e843b13df8ac1588ed4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 3624249202781090321, guid: 6fecc1a71494e914487a77c3da27554c, type: 3}
-  minX: -8
-  maxX: 8
-  minY: 8
-  maxY: -8
+  playerPrefabs:
+  - {fileID: 3624249202781090321, guid: 6fecc1a71494e914487a77c3da27554c, type: 3}
+  - {fileID: 3624249202781090321, guid: 6fecc1a71494e914487a77c3da27554c, type: 3}
+  rMinX: -5
+  rMaxX: 5
+  rMinY: -5
+  rMaxY: 5
+  sMinX: -5
+  sMaxX: 5
+  sMinY: -5
+  sMaxY: 5
   playersInRoom_List: []
   runnerSpawnLocations_List:
   - {fileID: 1053231969}

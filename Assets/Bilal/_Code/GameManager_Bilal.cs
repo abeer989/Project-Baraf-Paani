@@ -30,6 +30,8 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     bool areAllFrozen = false;
     bool isTimeOver = false;
 
+    List<Player> playersInRoomList = new List<Player>();
+
     enum GameState 
     {
         Idle,
@@ -43,12 +45,17 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     {
         spawnPlayersInstance.SpawnPlayers();
 
-        uiManagerInstance.SetStartBtnInteractibility(PhotonNetwork.IsMasterClient); // set interactibility if is master client
+       // uiManagerInstance.SetStartBtnInteractibility(PhotonNetwork.IsMasterClient); // set interactibility if is master client
 
         uiManagerInstance.onStartClicked = StartGame;
         gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
         uiManagerInstance.onPlayAgainClicked = PlayAgainEvent;
         uiManagerInstance.onleaveBtnClicked = LeaveRoom;
+
+        if(PhotonNetwork.IsMasterClient)
+        {
+            StartGame();
+        }
     }
 
     private void Update()
@@ -59,9 +66,11 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         
-        uiManagerInstance.SetStartBtnInteractibility(false);
+
+
+        //uiManagerInstance.SetStartBtnInteractibility(false);
         //StartCoroutine(StartGameCoroutine());
-        base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
+        //base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
 
         // Close Room when game has started
         PhotonNetwork.CurrentRoom.IsOpen = false;
@@ -81,9 +90,9 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         if (PhotonNetwork.IsMasterClient)
         {
-            var vId = DetermineSeeker();
+           // var vId = DetermineSeeker();
 
-            base.photonView.RPC(nameof(RPC_SetSeekerAndStartGameTimer), RpcTarget.All, vId);
+           //base.photonView.RPC(nameof(RPC_SetSeekerAndStartGameTimer), RpcTarget.All, vId);
 
             
             
@@ -94,7 +103,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         yield return new WaitUntil(() => gameState == GameState.SeekerDecided);
         
-        spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
+       // spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
 
         yield return StartCoroutine(RoundStartCountDownTimer(photonTime));
 
@@ -132,6 +141,9 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         yield return null;
 
     }
+
+
+
 
     public void WhenTimeOverFunction()
     {
