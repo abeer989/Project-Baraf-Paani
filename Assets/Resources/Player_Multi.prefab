@@ -654,6 +654,7 @@ MonoBehaviour:
   anim: {fileID: 3624249202781090320}
   photonView: {fileID: 0}
   isSeeker: 0
+  isReady: 0
   isFrozen: 0
 --- !u!61 &2721517239681508507
 BoxCollider2D:

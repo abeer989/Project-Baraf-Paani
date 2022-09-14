@@ -74,7 +74,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
 
        
-
+        
 
         PhotonNetwork.LoadLevel(2); // open game scene
     }
@@ -115,6 +115,12 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
         UpdatePlayerList();
+    }
+
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        
     }
 
 }

@@ -18,9 +18,13 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Button playAgainBtn;
 
 
+    [SerializeField] Button readyBTn;
+
+
     public System.Action onStartClicked;
     public System.Action onleaveBtnClicked;
     public System.Action onPlayAgainClicked;
+    public System.Action onReadyBtnClicked;
 
     [Header("Timer UI")]
     [SerializeField] TextMeshProUGUI timerTxt;
@@ -29,12 +33,15 @@ public class GameUIManager : MonoBehaviour
 
 
     [SerializeField] TextMeshProUGUI pingTxt;
+
+    
     
     private void Start()
     {
         startGameBtn.onClick.AddListener(delegate { onStartClicked?.Invoke(); });
         playAgainBtn.onClick.AddListener(delegate { onPlayAgainClicked?.Invoke(); });
         leaveBtn.onClick.AddListener(delegate { onleaveBtnClicked?.Invoke(); });
+        readyBTn.onClick.AddListener(delegate { onReadyBtnClicked?.Invoke(); readyBTn.interactable = false; readyBTn.gameObject.SetActive(false); });
     }
 
     public void SetPingTxt(string txt)

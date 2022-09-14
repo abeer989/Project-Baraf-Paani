@@ -42,12 +42,13 @@ public class SpawnPlayersHandler : MonoBehaviour
 
         if (isSeeker)
         {
-            randomPosition = new Vector2(Random.Range(rMinX, rMaxX), Random.Range(rMinY, rMaxY));
+            randomPosition = new Vector2(Random.Range(sMinX, sMaxX), Random.Range(sMinY, sMaxY));
 
         }
         else
         {
-            randomPosition = new Vector2(Random.Range(sMinX, sMaxX), Random.Range(sMinY, sMaxY));
+            randomPosition = new Vector2(Random.Range(rMinX, rMaxX), Random.Range(rMinY, rMaxY));
+            
         }
 
         int index = (int)PhotonNetwork.LocalPlayer.CustomProperties["playerAvatar"];

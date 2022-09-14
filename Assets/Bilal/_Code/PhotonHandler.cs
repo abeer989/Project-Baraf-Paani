@@ -21,15 +21,31 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         lobbyUImanagerInstance.onCreateClick += CreateRoom;
 
 
-        if(Application.internetReachability != NetworkReachability.NotReachable)
+
+        Debug.Log("ffad");
+        if(Application.internetReachability != NetworkReachability.NotReachable  )
         {
-            PhotonNetwork.AutomaticallySyncScene = true;
-            PhotonNetwork.ConnectUsingSettings();
+            Debug.Log("ffad");
+            if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby)
+            {
+                Debug.Log("ffad");
+                lobbyUImanagerInstance.SetActiveLoadingPanel(false);
+            }
+            else
+            {
+                Debug.Log("ffad");
+                PhotonNetwork.AutomaticallySyncScene = true;
+                PhotonNetwork.ConnectUsingSettings();
+            }
+
+           
 
         }
         else
         {
+            // give ui error of no internet connectivity and open reconnect button
             Debug.Log(" Not Connected To internet");
+            lobbyUImanagerInstance.SetActiveLoadingPanel(false);
         }    
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunObservable
+public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable
 {
     public PlayerMovement playerMovementInstance;  // handles movement - Dash- Pickup
     public PlayerIndicatorHandler indicatorInstance;
@@ -23,7 +23,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
     public PhotonView photonView;
 
     public bool isSeeker = false;
-
+    public bool isReady = false;
     bool isNearTarget;
     PlayerManager targetPlayer;
 
@@ -54,7 +54,14 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
         photonPlayer = photonView.Owner;
 
-        
+        if(photonPlayer != null)
+        {
+            Debug.Log($"photonPlayer nickname = {photonPlayer.NickName}");
+        }
+
+        isSeeker = (bool)photonPlayer.CustomProperties["isSeeker"];
+
+        Debug.Log("isseeker = " + isSeeker);
 
         pickUpHandlerInstance = GetComponent<PickUpHandler>();
         pickUpHandlerInstance.Direction = new Vector2(0, 0);
@@ -431,6 +438,7 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
 
     }
 
+    
 
     #endregion
 
@@ -445,5 +453,17 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         GameManager_Bilal.instance.spawnPlayersInstance.playersInRoom_List.Remove(this);    
     }
 
-    
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
+    {
+        if(changedProps.ContainsKey("isReady"))
+        {
+            if (targetPlayer == photonPlayer)
+            {
+                isReady = (bool)changedProps["isReady"];
+            }
+        }
+
+        
+    }
+
 }

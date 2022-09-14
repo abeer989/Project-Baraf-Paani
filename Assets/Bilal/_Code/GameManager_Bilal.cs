@@ -32,6 +32,14 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     //List<Player> playersInRoomList = new List<Player>();
 
+    [SerializeField] GameObject freezeGunPowerUpPrefab;
+    [SerializeField] GameObject invincibilityPowerUpPrefab;
+
+
+    
+
+
+ 
     enum GameState 
     {
         Idle,
@@ -43,7 +51,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     private void Start()
     {
-        spawnPlayersInstance.SpawnPlayers();
+        
 
        // uiManagerInstance.SetStartBtnInteractibility(PhotonNetwork.IsMasterClient); // set interactibility if is master client
 
@@ -51,12 +59,13 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
         uiManagerInstance.onPlayAgainClicked = PlayAgainEvent;
         uiManagerInstance.onleaveBtnClicked = LeaveRoom;
+        uiManagerInstance.onReadyBtnClicked = OnReadyFunction;
 
-        if(PhotonNetwork.IsMasterClient)
-        {
-            StartGame();
-        }
+        StartCoroutine(StartGameCoroutine(PhotonNetwork.Time));
     }
+
+    
+
 
     private void Update()
     {
@@ -67,35 +76,36 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     {
         
 
-
-        //uiManagerInstance.SetStartBtnInteractibility(false);
-        //StartCoroutine(StartGameCoroutine());
-        base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
-
-        // Close Room when game has started
-        PhotonNetwork.CurrentRoom.IsOpen = false;
-        PhotonNetwork.CurrentRoom.IsVisible = false;
-
-
     }
 
+    public void OnReadyFunction()
+    {
+        ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
+        hash["isReady"] = true;
+
+        PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+    }
+    
     public void SetAllPlayersIndicatorStatus()
     {
-        //foreach(var playerdict in PhotonNetwork.CurrentRoom.Players)
-        //{
-        //    var isSeeker = playerdict.Value.CustomProperties["isSeeker"];
 
-
-
-
-        //    playersInRoomList.Add(playerdict.Value);
-        //}
+        if(PhotonNetwork.IsMasterClient)
+        {
+            // Close Room when game has started
+            PhotonNetwork.CurrentRoom.IsOpen = false;
+            PhotonNetwork.CurrentRoom.IsVisible = false;
+        }
+        
 
 
         var playerList = spawnPlayersInstance.playersInRoom_List;
 
+        Debug.Log($"player List = {playerList.Count}");
+
         foreach(var player in playerList)
         {
+            Debug.Log($"pp =  {player.photonPlayer.NickName} ");
+
             if(player.isSeeker)
             {
                 player.indicatorInstance.SetIndicator(true);
@@ -108,17 +118,38 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
+    public bool CheckIfAllReady()
+    {
+        foreach(var player in spawnPlayersInstance.playersInRoom_List)
+        {
+            if(!player.isReady)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     public IEnumerator StartGameCoroutine(double photonTime)
     {
         Debug.Log("Starting Game...");
         gameState = GameState.SetUP;
 
+        //Waiting for all to spawn ;
 
-       
+        yield return new WaitForSeconds(1);
+
+        spawnPlayersInstance.SpawnPlayers();
+
+
+        yield return new WaitForSeconds(3);
+
+        yield return new WaitUntil(CheckIfAllReady);
 
         SetAllPlayersIndicatorStatus();
 
+        
        
         
        // spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
@@ -130,6 +161,10 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         gameState = GameState.GameStart;
         isGameActive = true;
 
+        if(PhotonNetwork.IsMasterClient)
+        {
+           StartCoroutine( SpawnPowerUps());
+        }
 
 
         // wait for game start timer
@@ -137,7 +172,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         // run time and check for time
         // catching mechanic
         gameTimerInstance.InitializeTimer(photonTime);
-        yield return new WaitUntil( ()=> CheckIFEveryRunnerIsFrozen() || isTimeOver);
+        yield return new WaitUntil(() => CheckIFEveryRunnerIsFrozen() || isTimeOver);
 
         gameTimerInstance.StopTimer();
 
@@ -160,7 +195,31 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
+    WaitForSeconds powerUpDelay = new WaitForSeconds(10);
 
+    IEnumerator SpawnPowerUps()
+    {
+        Vector2 minPos = new Vector2(-9, -9);
+        Vector2 maxPos = new Vector2(9, 9);
+
+
+        int i = 1;
+        while(gameState == GameState.GameStart)
+        {
+            yield return powerUpDelay;
+
+            var spawnPos = new Vector2(Random.Range(minPos.x, maxPos.x), Random.Range(minPos.y, maxPos.y));
+            PhotonNetwork.InstantiateRoomObject(invincibilityPowerUpPrefab.name, spawnPos, Quaternion.identity);
+            
+            if(i%2==0)
+            {
+                var s = new Vector2(Random.Range(minPos.x, maxPos.x), Random.Range(minPos.y, maxPos.y));
+                PhotonNetwork.InstantiateRoomObject(freezeGunPowerUpPrefab.name, s, Quaternion.identity);
+            }
+            
+            i++;
+        }
+    }
 
 
     public void WhenTimeOverFunction()
@@ -333,6 +392,8 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     public void LeaveRoom()
     {
+
+
         PhotonNetwork.LoadLevel(0);
     }
 

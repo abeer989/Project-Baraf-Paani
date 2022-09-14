@@ -54,23 +54,34 @@ public class PlayerPowerUpHandler : MonoBehaviour
         if(powerUp.type == PowerUpItem.PowerUpType.IceGun)
         {
             // do this
+            if(managerInstance.isSeeker)
+            {
+                onIceGunActive?.Invoke();
 
-            onIceGunActive?.Invoke();
-            
 
+                powerUp.SetActiveMe(false);
+            }
 
+           
         }
         else if(powerUp.type == PowerUpItem.PowerUpType.TwoTimes)
         {
             // do this
+            if(!managerInstance.isSeeker && !managerInstance.isFrozen)
+            {
+                onInvincActive?.Invoke();
 
-            onInvincActive?.Invoke();
+                powerUp.SetActiveMe(false);
+            }
+
+
+           
         }
 
 
 
 
-        powerUp.SetActiveMe(false);
+       
        // Destroy(powerUp.gameObject);
     }
 
