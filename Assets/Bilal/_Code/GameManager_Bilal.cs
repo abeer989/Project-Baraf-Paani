@@ -30,7 +30,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     bool areAllFrozen = false;
     bool isTimeOver = false;
 
-    List<Player> playersInRoomList = new List<Player>();
+    //List<Player> playersInRoomList = new List<Player>();
 
     enum GameState 
     {
@@ -70,7 +70,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         //uiManagerInstance.SetStartBtnInteractibility(false);
         //StartCoroutine(StartGameCoroutine());
-        //base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
+        base.photonView.RPC(nameof(RPC_StartGame),RpcTarget.All, PhotonNetwork.Time);
 
         // Close Room when game has started
         PhotonNetwork.CurrentRoom.IsOpen = false;
@@ -79,7 +79,34 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
+    public void SetAllPlayersIndicatorStatus()
+    {
+        //foreach(var playerdict in PhotonNetwork.CurrentRoom.Players)
+        //{
+        //    var isSeeker = playerdict.Value.CustomProperties["isSeeker"];
 
+
+
+
+        //    playersInRoomList.Add(playerdict.Value);
+        //}
+
+
+        var playerList = spawnPlayersInstance.playersInRoom_List;
+
+        foreach(var player in playerList)
+        {
+            if(player.isSeeker)
+            {
+                player.indicatorInstance.SetIndicator(true);
+            }
+            else
+            {
+                player.indicatorInstance.SetIndicator(false);
+            }
+        }
+
+    }
 
 
     public IEnumerator StartGameCoroutine(double photonTime)
@@ -88,20 +115,11 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         gameState = GameState.SetUP;
 
 
-        if (PhotonNetwork.IsMasterClient)
-        {
-           // var vId = DetermineSeeker();
+       
 
-           //base.photonView.RPC(nameof(RPC_SetSeekerAndStartGameTimer), RpcTarget.All, vId);
+        SetAllPlayersIndicatorStatus();
 
-            
-            
-
-
-        }
-
-
-        yield return new WaitUntil(() => gameState == GameState.SeekerDecided);
+       
         
        // spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
 

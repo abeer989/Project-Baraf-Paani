@@ -51,6 +51,11 @@ public class PlayerManager : MonoBehaviour, IPunInstantiateMagicCallback, IPunOb
         if (!photonView)
             photonView = GetComponent<PhotonView>();
 
+
+        photonPlayer = photonView.Owner;
+
+        
+
         pickUpHandlerInstance = GetComponent<PickUpHandler>();
         pickUpHandlerInstance.Direction = new Vector2(0, 0);
 
