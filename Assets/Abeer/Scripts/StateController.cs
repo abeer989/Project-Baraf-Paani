@@ -4,24 +4,29 @@ using UnityEngine;
 public class StateController : MonoBehaviour
 {
     [SerializeField] GameObject interactionCanvas;
-    [SerializeField] TextMeshProUGUI barafIndicatorText;
+    //[SerializeField] TextMeshProUGUI barafIndicatorText;
 
     bool isBaraf;
-    bool barafPossible;
+    bool stateChangePossible;
 
     public bool IsBaraf { get { return isBaraf; } }
 
     void Update()
     {
-        if (barafPossible)
+        if (stateChangePossible)
         {
             interactionCanvas.SetActive(true);
 
             if (Input.GetKeyDown(KeyCode.E))
             {
-                barafPossible = false;
-                interactionCanvas.SetActive(false);
-                Baraf();
+                //stateChangePossible = false;
+                //interactionCanvas.SetActive(false);
+
+                if (!isBaraf)
+                    Baraf();
+
+                else
+                    Paani();
             }
         }
 
@@ -32,14 +37,25 @@ public class StateController : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag(Tags.playerTag))
-            barafPossible = true;
+            stateChangePossible = true;
     }    
     
     private void OnTriggerExit2D(Collider2D other)
     {
         if (other.CompareTag(Tags.playerTag))
-            barafPossible = false;
+            stateChangePossible = false;
     }
 
-    public void Baraf() => isBaraf = true;
+    public void Baraf()
+    {
+        GameManager.instance.UpdateScore(1);
+        isBaraf = true;
+    }
+
+    public void Paani()
+    {
+        GameManager.instance.UpdateScore(-1);
+        isBaraf = false;
+        GetComponentInParent<NPCController>()?.JailCRBoolOff();
+    }
 }
