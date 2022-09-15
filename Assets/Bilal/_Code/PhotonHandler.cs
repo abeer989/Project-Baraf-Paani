@@ -9,6 +9,7 @@ using Photon.Pun;
 public class PhotonHandler : MonoBehaviourPunCallbacks
 {
     public LobbyUIManager lobbyUImanagerInstance;
+    public TitleUIManager titleUImanagerInstance;
 
     public int levelToLoadIndex;
 
@@ -61,6 +62,7 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
     public override void OnJoinedLobby()
     {
         lobbyUImanagerInstance.SetActiveLoadingPanel(false);
+        titleUImanagerInstance.InitializeTitleTween();
 
     }
 
