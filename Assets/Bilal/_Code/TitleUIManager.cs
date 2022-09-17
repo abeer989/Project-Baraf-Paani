@@ -4,16 +4,22 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
+using System;
 public class TitleUIManager : MonoBehaviour
 {
 
 
     [SerializeField] CanvasGroup uiPanelcanvasGroup;
+    
 
     [SerializeField] Button startBtn;
     [SerializeField] Button leaderBoardBtn;
     //[SerializeField] Button settingBtn;
 
+    public Action onStartClick;
+    public Action onLeaderBoardClick;
+
+    
 
     [SerializeField] RectTransform titleRectTransform;
 
@@ -33,7 +39,7 @@ public class TitleUIManager : MonoBehaviour
 
     private void Start()
     {
-        startBtn.onClick.AddListener(delegate { FadeOutPanel(); });
+        startBtn.onClick.AddListener(delegate { onStartClick(); });
     }
 
     public void InitializeTitleTween()
@@ -47,15 +53,21 @@ public class TitleUIManager : MonoBehaviour
         titleSequence.Play();
     }
 
+    
 
     public void FadeOutPanel()
     {
         uiPanelcanvasGroup.DOFade(0, fadeDuration);
+        uiPanelcanvasGroup.interactable = false;
+      //  uiPanelcanvasGroup.blocksRaycasts = false;
+
     }
 
     public void FadeInPanel()
     {
         uiPanelcanvasGroup.DOFade(1, fadeDuration);
+        uiPanelcanvasGroup.interactable = true;
+       // uiPanelcanvasGroup.blocksRaycasts = true;
     }
 
     public void OnDisable()

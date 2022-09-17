@@ -18,8 +18,13 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        titleUImanagerInstance.onStartClick += OnStartClickEvent;
+
+
+
         lobbyUImanagerInstance.onJoinClick += JoinRoom;
         lobbyUImanagerInstance.onCreateClick += CreateRoom;
+        lobbyUImanagerInstance.onBackClick += LobbyBackEvent;
 
 
 
@@ -50,13 +55,65 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         }    
     }
 
+    public void OnStartClickEvent()
+    {
+        titleUImanagerInstance.FadeOutPanel();
+        lobbyUImanagerInstance.FadeInPanel();
+    }
+    public void JoinRoom()
+    {
+        if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
+        {
+            lobbyUImanagerInstance.SetStaticText("Please Input Room Name To Create Or Join.");
+            return;
+        }
+
+        if (!lobbyUImanagerInstance.ValidateName())
+            return;
+
+        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
+        PhotonNetwork.JoinRoom(lobbyUImanagerInstance.GetRoomName());
+
+        Debug.Log("Joining Room");
+
+
+    }
+
+    public void CreateRoom()
+    {
+        if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
+        {
+            lobbyUImanagerInstance.SetStaticText("Please Input Room Name To Create Or Join.");
+            return;
+        }
+
+        if (!lobbyUImanagerInstance.ValidateName())
+            return;
+
+        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
+
+        PhotonNetwork.CreateRoom(lobbyUImanagerInstance.GetRoomName(),
+            new Photon.Realtime.RoomOptions() { MaxPlayers = 5, BroadcastPropsChangeToAll = true });
+    }
+
+    public void LobbyBackEvent()
+    {
+        lobbyUImanagerInstance.ResetLobbyForm();
+
+        titleUImanagerInstance.FadeInPanel();
+        lobbyUImanagerInstance.FadeOutPanel();
+    }
+
+    #region PHOTON
+
+
     public override void OnConnectedToMaster()
     {
-        
+
 
         PhotonNetwork.JoinLobby();
 
-        
+
     }
 
     public override void OnJoinedLobby()
@@ -76,41 +133,18 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
     {
 
         Debug.Log($"On Join Error: -> {message} | {returnCode}");
-        
+        lobbyUImanagerInstance.SetStaticText(message);
+
     }
 
     public override void OnCreateRoomFailed(short returnCode, string message)
     {
         Debug.Log($"On Create Error: -> {message} | {returnCode}");
+        lobbyUImanagerInstance.SetStaticText(message);
     }
-
-    public void JoinRoom()
-    {
-        if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
-            return;
-
-        if (!lobbyUImanagerInstance.ValidateName())
-            return;
-
-        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
-        PhotonNetwork.JoinRoom(lobbyUImanagerInstance.GetRoomName());
-
-        Debug.Log("Joining Room");
+    #endregion
 
 
-    }
 
-    public void CreateRoom()
-    {
-        if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
-            return;
 
-        if (!lobbyUImanagerInstance.ValidateName())
-            return;
-
-        PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
-
-        PhotonNetwork.CreateRoom(lobbyUImanagerInstance.GetRoomName(),
-            new Photon.Realtime.RoomOptions() { MaxPlayers = 5, BroadcastPropsChangeToAll = true});
-    }
 }
