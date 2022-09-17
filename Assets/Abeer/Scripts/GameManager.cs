@@ -1,6 +1,8 @@
 using TMPro;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,6 +15,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject gameWonScreen;
     [SerializeField] TextMeshProUGUI timeText;
     [SerializeField] float defaultTimeValue;
+
+    [Space]
+    [SerializeField] string gameplaySceneName;
 
     int score;
     float timer;
@@ -75,17 +80,19 @@ public class GameManager : MonoBehaviour
         if (score < ((noOfRunners / 2) + 1))
         {
             gameOverScreen.SetActive(true);
-            //Debug.LogError("GAME OVER!"); // GAME OVER LOGIC
-
+            PlayfabLeaderboardManager.instance.UpdateLeaderBoard(0);
         }
 
         else
         {
             gameWonScreen.SetActive(true);
-            PlayfabManager.instance.UpdateLeaderBoard(1);
-            //Debug.LogError("GAME WON!"); // GAME WIN LOGIC
+            PlayfabLeaderboardManager.instance.UpdateLeaderBoard(1);
         }
     }
+
+    public void Replay() => SceneManager.LoadScene(gameplaySceneName);
+
+    public void Quit() => Application.Quit();
 
     private void FormatText()
     {
