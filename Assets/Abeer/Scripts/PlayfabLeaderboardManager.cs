@@ -57,10 +57,17 @@ public class PlayfabLeaderboardManager : MonoBehaviour
         PlayFabClientAPI.GetLeaderboard(request, OnLeaderboardGet, OnError);
     }
 
+    public void CloseLeaderboard()
+    {
+        leaderBoardPanel.SetActive(false);
+        Time.timeScale = 1;
+    }
+
     #region Callbacks
     private void OnLeaderboardGet(GetLeaderboardResult obj)
     {
         leaderBoardPanel.SetActive(true);
+        Time.timeScale = 0;
 
         for (int i = 0; i < entryParent.childCount; i++)
             Destroy(entryParent.GetChild(i).gameObject);
