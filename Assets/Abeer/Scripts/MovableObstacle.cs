@@ -44,16 +44,12 @@ public class MovableObstacle : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("hehe");
-
         if (other.CompareTag(Tags.playerTag))
             inContact = true;
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        Debug.Log("hehe2");
-
         if (other.CompareTag(Tags.playerTag))
             inContact = false;
     }
