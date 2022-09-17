@@ -40,6 +40,7 @@ public class TitleUIManager : MonoBehaviour
     private void Start()
     {
         startBtn.onClick.AddListener(delegate { onStartClick(); });
+        leaderBoardBtn.onClick.AddListener(delegate { onLeaderBoardClick(); });
     }
 
     public void InitializeTitleTween()

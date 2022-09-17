@@ -4,12 +4,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using TMPro;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] Button playButton;
 
-
+    [SerializeField] TextMeshProUGUI roomNameTxt;
+    [SerializeField] TextMeshProUGUI playerTxt;
 
     public List<PlayerItemController> playerItemList;
     public PlayerItemController playerItemPrefab;
@@ -25,7 +27,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         UpdatePlayerList();
 
-
+        roomNameTxt.text = PhotonNetwork.CurrentRoom.Name;
+        SetPlayerCountTxt(PhotonNetwork.CurrentRoom.PlayerCount);
 
         playButton.onClick.AddListener(OnClickPlayEvent);
     }
@@ -41,6 +44,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
             playButton.gameObject.SetActive(false);
         }
     }
+
+    
 
     public void DetermineSeeker()
     {
@@ -107,13 +112,24 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
     }
 
+
+    public void SetPlayerCountTxt(int count)
+    {
+        playerTxt.text = $"Player: {count}";
+    }    
+
     public override void OnPlayerEnteredRoom(Player newPlayer)
     {
+        SetPlayerCountTxt(PhotonNetwork.CurrentRoom.PlayerCount);
+        
+
         UpdatePlayerList();
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
     {
+        SetPlayerCountTxt(PhotonNetwork.CurrentRoom.PlayerCount);
+
         UpdatePlayerList();
     }
 

@@ -10,6 +10,8 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
 {
     public LobbyUIManager lobbyUImanagerInstance;
     public TitleUIManager titleUImanagerInstance;
+    public LeaderBoardUIController leaderBoardUIInstance;
+
 
     public int levelToLoadIndex;
 
@@ -19,7 +21,7 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
     private void Start()
     {
         titleUImanagerInstance.onStartClick += OnStartClickEvent;
-
+        titleUImanagerInstance.onLeaderBoardClick += OnLeaderBoardClickEvent;
 
 
         lobbyUImanagerInstance.onJoinClick += JoinRoom;
@@ -27,6 +29,8 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         lobbyUImanagerInstance.onBackClick += LobbyBackEvent;
 
 
+        leaderBoardUIInstance.onBackClick += LeaderboardBackEvent;
+        
 
         Debug.Log("ffad");
         if(Application.internetReachability != NetworkReachability.NotReachable  )
@@ -60,6 +64,19 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         titleUImanagerInstance.FadeOutPanel();
         lobbyUImanagerInstance.FadeInPanel();
     }
+
+    public void OnLeaderBoardClickEvent()
+    {
+        titleUImanagerInstance.FadeOutPanel();
+        leaderBoardUIInstance.FadeInPanel();
+    }
+
+    public void LeaderboardBackEvent()
+    {
+        titleUImanagerInstance.FadeInPanel();
+        leaderBoardUIInstance.FadeOutPanel();
+    }
+
     public void JoinRoom()
     {
         if (string.IsNullOrEmpty(lobbyUImanagerInstance.GetRoomName()))
