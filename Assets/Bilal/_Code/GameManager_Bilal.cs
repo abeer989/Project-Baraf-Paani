@@ -20,7 +20,10 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     public GamePhotonManager photonManagerInstance;
 
     public GameUIManager uiManagerInstance;
+
     public TimerHandler gameTimerInstance;
+
+    public PowerUpUIEffectController powerUpUIeffectControllerInstance;
 
     bool isGameActive = false;
 
@@ -36,7 +39,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     [SerializeField] GameObject invincibilityPowerUpPrefab;
 
 
-    
+    [SerializeField] PlayFabManager playfabManager;
 
 
  
@@ -57,7 +60,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         uiManagerInstance.onStartClicked = StartGame;
         gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
-        uiManagerInstance.onPlayAgainClicked = PlayAgainEvent;
+        uiManagerInstance.onBackToRoomClicked = PlayAgainEvent;
         uiManagerInstance.onleaveBtnClicked = LeaveRoom;
         uiManagerInstance.onReadyBtnClicked = OnReadyFunction;
 
@@ -183,12 +186,27 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         {
             uiManagerInstance.SetActiveGameOverPanel(true);
             uiManagerInstance.SetGameOverText("Seeker Won The Game");
+
+            /// Updating LEader Boards
+            if (spawnPlayersInstance.localPlayerManager.isSeeker)
+                playfabManager.UpdateLB_Seeker(1, true, 100);
+            else
+                playfabManager.UpdateLB_Runner(1, false, 100);
+            
         }
         else
         {
             uiManagerInstance.SetActiveGameOverPanel(true);
             uiManagerInstance.SetGameOverText("Time Over! The runner team has won");
+
+            /// Updating LEader Boards
+            if (spawnPlayersInstance.localPlayerManager.isSeeker)
+                playfabManager.UpdateLB_Seeker(1, false, 100);
+            else
+                playfabManager.UpdateLB_Runner(1, true, 100);
         }
+
+        
 
 
         yield return null;
@@ -221,7 +239,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         }
     }
 
-
+   
     public void WhenTimeOverFunction()
     {
         isTimeOver = true;
@@ -394,7 +412,10 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
     {
 
 
-        PhotonNetwork.LoadLevel(0);
+        //PhotonNetwork.LoadLevel(0);
+
+        PhotonNetwork.LoadLevel(1);
+
     }
 
     [PunRPC]
@@ -410,6 +431,18 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         //spawnPlayersInstance.SpawnAllPlayersInGameReadyLocations();
 
+    }
+
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        if(PhotonNetwork.IsMasterClient)
+        {
+
+            LeaveRoom();
+
+
+        }
     }
 
     #endregion

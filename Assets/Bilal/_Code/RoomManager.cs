@@ -5,10 +5,12 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class RoomManager : MonoBehaviourPunCallbacks
 {
     [SerializeField] Button playButton;
+    [SerializeField] Button leaveBtn;
 
     [SerializeField] TextMeshProUGUI roomNameTxt;
     [SerializeField] TextMeshProUGUI playerTxt;
@@ -31,6 +33,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
         SetPlayerCountTxt(PhotonNetwork.CurrentRoom.PlayerCount);
 
         playButton.onClick.AddListener(OnClickPlayEvent);
+        leaveBtn.onClick.AddListener(LeaveRoom);
     }
 
     private void Update()
@@ -137,6 +140,25 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public override void OnPlayerPropertiesUpdate(Player targetPlayer, ExitGames.Client.Photon.Hashtable changedProps)
     {
         
+    }
+
+    public void LeaveRoom()
+    {
+
+        PhotonNetwork.LeaveRoom();
+        
+    }
+
+
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene(0);
+    }
+
+
+    public override void OnMasterClientSwitched(Player newMasterClient)
+    {
+        Debug.Log("Master Client Switched");
     }
 
 }

@@ -17,4 +17,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/_Scenes/BilalScene_Multi.unity
     guid: 73f19ead95d8b774f839c5fcdb64988e
+  - enabled: 1
+    path: Assets/_Scenes/Test - Abeer.unity
+    guid: 3305ca9ad0ef19744b2a094259bb1f2b
   m_configObjects: {}

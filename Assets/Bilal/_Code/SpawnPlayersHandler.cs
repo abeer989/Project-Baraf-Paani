@@ -23,6 +23,8 @@ public class SpawnPlayersHandler : MonoBehaviour
 
     public List<PlayerManager> playersInRoom_List;
 
+    public PlayerManager localPlayerManager;
+
     [SerializeField] List<Transform> runnerSpawnLocations_List;
     [SerializeField] List<Transform> seekersSpawnLocations_List;
 
@@ -66,6 +68,7 @@ public class SpawnPlayersHandler : MonoBehaviour
         pm.isSeeker = isSeeker;
         pm.LockPlayer();
         playersInRoom_List.Add(pm);
+        localPlayerManager = pm;
 
     }
 

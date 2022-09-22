@@ -12,6 +12,7 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
     public TitleUIManager titleUImanagerInstance;
     public LeaderBoardUIController leaderBoardUIInstance;
 
+    public PlayFabManager playfabManager;
 
     public int levelToLoadIndex;
 
@@ -88,6 +89,9 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         if (!lobbyUImanagerInstance.ValidateName())
             return;
 
+        if (string.IsNullOrEmpty(playfabManager.playerProfile.DisplayName))
+            playfabManager.UpdateName(lobbyUImanagerInstance.GetPlayerName());
+
         PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
         PhotonNetwork.JoinRoom(lobbyUImanagerInstance.GetRoomName());
 
@@ -106,6 +110,9 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
 
         if (!lobbyUImanagerInstance.ValidateName())
             return;
+
+        if (string.IsNullOrEmpty(playfabManager.playerProfile.DisplayName))
+            playfabManager.UpdateName(lobbyUImanagerInstance.GetPlayerName());
 
         PhotonNetwork.NickName = lobbyUImanagerInstance.GetPlayerName();
 
@@ -128,7 +135,10 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
     {
 
 
+        playfabManager.LoginCustomID();
+
         PhotonNetwork.JoinLobby();
+
 
 
     }

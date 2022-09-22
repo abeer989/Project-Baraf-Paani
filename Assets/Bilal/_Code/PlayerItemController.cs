@@ -46,7 +46,10 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
     public void SetPlayerInfo(Player _player)
     {
         player = _player;
-        SetNameText(_player.NickName);
+
+        string playerName = _player.IsMasterClient ? $"{_player.NickName}(Host)" : $"{_player.NickName}";
+
+        SetNameText(playerName);
         UpdatePlayerItem(player);
         PhotonNetwork.SetPlayerCustomProperties(playerProps);
     }

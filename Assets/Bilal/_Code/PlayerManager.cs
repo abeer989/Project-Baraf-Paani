@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
-
+using DG.Tweening;
 public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCallback, IPunObservable
 {
     public PlayerMovement playerMovementInstance;  // handles movement - Dash- Pickup
@@ -14,10 +14,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     public PlayerFreezeShotController freezeShotControllerInstance;
     public PlayerPowerUpHandler powerUpHandlerInstance;
 
-
+    [SerializeField] ParticleSystem iceParticleSystem;
     [SerializeField] SpriteRenderer playerSprite;
     [SerializeField] Animator anim;
 
+    [SerializeField] ParticleSystem waterSplashPartiSystem;
 
     public Player photonPlayer;
     public PhotonView photonView;
@@ -34,6 +35,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     bool m_firstTake = true;
 
 
+
     Vector2 updatedMovement;
 
     Vector2 networkPos;
@@ -43,9 +45,21 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     bool isIceGunActive = false;
     bool isInvincible = false;
 
+
+    CameraShakeController camShakeController;
+
+    [Space]
+
+    Tween invincibilityEffectTween;
+
+    [Header("Tween Controls")]
+    
+    [SerializeField] Gradient invincColorTarget;
+    [SerializeField] float tweenDuration;
+    
     private void Start()
     {
-        
+        camShakeController = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraShakeController>();
 
 
         if (!photonView)
@@ -262,12 +276,17 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
 
     public void FreezePlayer()
     {
+        camShakeController.ShakeCamera();
+
         Debug.Log("FreezingPlayer");
         photonView.RPC(nameof(RPC_Freeze), RpcTarget.All);
     }
 
     public void UnFreezePlayer()
     {
+        
+        camShakeController.ShakeCamera();
+
         Debug.Log("UnfreezePlayer");
         photonView.RPC(nameof(RPC_UnFreeze), RpcTarget.All);
     }
@@ -312,6 +331,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         if (isIceGunActive)
             return;
 
+
+        GameManager_Bilal.instance.powerUpUIeffectControllerInstance.SetActiveIceTween();
+
         isIceGunActive = true;
         StartCoroutine(powerUpHandlerInstance.PowerCountDown(StopIceGun));
     }
@@ -321,10 +343,30 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         isIceGunActive = false;
     }
 
+    
+    void ControlInvincibilityTween(bool state)
+    {
+        if (state)
+        {
+            invincibilityEffectTween = playerSprite.DOGradientColor(invincColorTarget, tweenDuration).SetLoops(-1, LoopType.Yoyo);
+        }
+        else
+        {
+            if (invincibilityEffectTween != null)
+                invincibilityEffectTween.Kill();
+
+            playerSprite.color = Color.white;
+        }
+    }
+
+
     public void ActivateInvincibility()
     {
-      
-       StartCoroutine(powerUpHandlerInstance.PowerCountDown(StopInvincibility));
+
+
+        GameManager_Bilal.instance.powerUpUIeffectControllerInstance.SetActiveInvinciTween();
+
+        StartCoroutine(powerUpHandlerInstance.PowerCountDown(StopInvincibility));
        
 
        Debug.Log("Active Invincibiltiy");
@@ -394,8 +436,9 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     {
         Debug.Log($"Is invincible = {state}");
         isInvincible = state;
-        
-      
+
+
+        ControlInvincibilityTween(state);
 
 
     }
@@ -417,7 +460,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         SetAnimation(Vector2.zero);
         playerMovementInstance.StopMovement();
         indicatorInstance.SetActiveBrufIndicator(true);
-        
+
+        iceParticleSystem.Play();
         
 
     }
@@ -435,6 +479,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         playerSprite.color = Color.white;
         isFrozen = false;
         indicatorInstance.SetActiveBrufIndicator(false);
+
+        waterSplashPartiSystem.Play();
 
     }
 

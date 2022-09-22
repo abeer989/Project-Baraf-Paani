@@ -5,6 +5,8 @@ using UnityEngine.UI;
 using TMPro;
 using System;
 using DG.Tweening;
+using PlayFab;
+using PlayFab.ClientModels;
 public class LobbyUIManager : MonoBehaviour
 {
     [SerializeField] GameObject loadingPnlGO;
@@ -21,6 +23,8 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField] Image iceIcon;
 
     [SerializeField] TextMeshProUGUI statusTxt;
+
+    [SerializeField] PlayFabManager playfabManager;
 
     public Action onJoinClick;
     public Action onCreateClick;
@@ -58,7 +62,15 @@ public class LobbyUIManager : MonoBehaviour
         lobbyCanvasGroup.DOFade(1, fadeDuration);
         lobbyCanvasGroup.interactable = true;
         lobbyCanvasGroup.blocksRaycasts = true;
+
+        if(!string.IsNullOrEmpty( playfabManager.playerProfile.DisplayName))
+        {
+            playerNameIF.text = playfabManager.playerProfile.DisplayName;
+            playerNameIF.interactable = false;
+        }
+
     }
+
 
 
     public string GetRoomName()
@@ -74,6 +86,14 @@ public class LobbyUIManager : MonoBehaviour
     public void SetActiveLoadingPanel(bool state)
     {
         loadingPnlGO.SetActive(state);
+
+        if(!state)
+        {
+            if (iceRotateTween != null)
+                iceRotateTween.Kill();
+        }
+
+        
     }
 
     public void SetStaticText(string text)

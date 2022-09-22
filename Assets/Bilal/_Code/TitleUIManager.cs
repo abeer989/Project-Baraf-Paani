@@ -49,12 +49,16 @@ public class TitleUIManager : MonoBehaviour
 
         titleSequence.Append(titleRectTransform.DOScale(Vector2.one, titlePopDuration).SetEase(titlePopEase));
         titleSequence.Append(titleBtnOptionsTransform.DOAnchorPosY(targetPos.y, optionPopDuration).SetEase(optionPopEase));
-        titleSequence.Append(titleRectTransform.DOScale(new Vector3(1.2f, 1.2f, 1), 3).SetLoops(-1,LoopType.Yoyo).SetEase(Ease.InOutCubic));
+        titleSequence.AppendCallback(LoopTitlePop);
 
         titleSequence.Play();
     }
 
-    
+    Tween titlePopTween;
+    void LoopTitlePop()
+    {
+        titlePopTween = titleRectTransform.DOScale(new Vector3(1.2f, 1.2f, 1), 3).SetLoops(-1, LoopType.Yoyo).SetEase(Ease.InOutCubic);
+    }
 
     public void FadeOutPanel()
     {
@@ -78,8 +82,25 @@ public class TitleUIManager : MonoBehaviour
             titleSequence.Kill();
         }
 
+        if(titlePopTween !=null)
+        {
+            titlePopTween.Kill();
+        }
         
     }
 
+    private void OnDestroy()
+    {
+        if (titleSequence != null)
+        {
+            titleSequence.Kill();
+        }
+
+        if (titlePopTween != null)
+        {
+            titlePopTween.Kill();
+        }
+
+    }
 
 }

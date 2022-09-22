@@ -63,6 +63,7 @@ public class PlayfabLoginManager : MonoBehaviour
     {
         string name = null;
 
+
         if (result.InfoResultPayload.PlayerProfile != null) 
         {
             if (!string.IsNullOrEmpty(result.InfoResultPayload.PlayerProfile.DisplayName.Trim()))

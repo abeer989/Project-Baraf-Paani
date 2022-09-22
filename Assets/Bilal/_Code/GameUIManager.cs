@@ -7,23 +7,25 @@ using TMPro;
 public class GameUIManager : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI playerCountText;
-
     [SerializeField] Button startGameBtn;
-
     [SerializeField] Button leaveBtn;
+    [SerializeField] Button readyBTn;
+
+    [Space]
+
+    [Header("Game Over Panel")]
 
     [SerializeField] GameObject gameOverPanel;
     [SerializeField] TextMeshProUGUI WinText;
+    
+    [SerializeField] Button backToRoomBtn;
 
-    [SerializeField] Button playAgainBtn;
 
-
-    [SerializeField] Button readyBTn;
-
+    
 
     public System.Action onStartClicked;
     public System.Action onleaveBtnClicked;
-    public System.Action onPlayAgainClicked;
+    public System.Action onBackToRoomClicked;
     public System.Action onReadyBtnClicked;
 
     [Header("Timer UI")]
@@ -39,7 +41,7 @@ public class GameUIManager : MonoBehaviour
     private void Start()
     {
         startGameBtn.onClick.AddListener(delegate { onStartClicked?.Invoke(); });
-        playAgainBtn.onClick.AddListener(delegate { onPlayAgainClicked?.Invoke(); });
+        backToRoomBtn.onClick.AddListener(delegate { onBackToRoomClicked?.Invoke(); });
         leaveBtn.onClick.AddListener(delegate { onleaveBtnClicked?.Invoke(); });
         readyBTn.onClick.AddListener(delegate { onReadyBtnClicked?.Invoke(); readyBTn.interactable = false; readyBTn.gameObject.SetActive(false); });
     }
@@ -51,7 +53,11 @@ public class GameUIManager : MonoBehaviour
 
     public void SetTimerText(int value)
     {
-        timerTxt.text = $"Time Left: {value}";
+        //timerTxt.text = $"Time Left: {value}";
+
+        System.TimeSpan t = System.TimeSpan.FromSeconds(value); 
+
+        timerTxt.text = $"Time Remaining:\n{t.Minutes}:{t.Seconds}";
     }
 
     public void ResetTimerTxt()
