@@ -20,8 +20,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public Transform playerItemParents;
 
+    GameObject localPlayerObject;
+
+    [SerializeField] GameObject playerPrefab_1;
+    [SerializeField] GameObject playerPrefab_2;
     private void Start()
     {
+
+        SpawnPlayer();
 
         ExitGames.Client.Photon.Hashtable hash = new ExitGames.Client.Photon.Hashtable();
         hash["isSeeker"] = false;
@@ -48,7 +54,41 @@ public class RoomManager : MonoBehaviourPunCallbacks
         }
     }
 
-    
+    public void SpawnPlayer()
+    {
+        if(localPlayerObject!=null)
+        {
+            PhotonNetwork.Destroy(localPlayerObject);
+        }
+
+        var hash = PhotonNetwork.LocalPlayer.CustomProperties;
+
+        if(hash.ContainsKey("playerAvatar"))
+        {
+            if ((int)hash["playerAvatar"] == 0)
+            {
+                Vector2 pos = new Vector2(Random.Range(-5, 5), Random.Range(-3, 0.2f));
+
+                localPlayerObject = PhotonNetwork.Instantiate(playerPrefab_1.name, pos, Quaternion.identity);
+            }
+            else if ((int)hash["playerAvatar"] == 1)
+            {
+                Vector2 pos = new Vector2(Random.Range(-5, 5), Random.Range(-3, 0.2f));
+
+                localPlayerObject = PhotonNetwork.Instantiate(playerPrefab_2.name, pos, Quaternion.identity);
+            }
+        }
+        else
+        {
+            Vector2 pos = new Vector2(Random.Range(-5, 5), Random.Range(-3, 0.2f));
+
+            localPlayerObject = PhotonNetwork.Instantiate(playerPrefab_1.name, pos, Quaternion.identity);
+        }
+
+        
+
+       
+    }
 
     public void DetermineSeeker()
     {
@@ -77,15 +117,23 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void OnClickPlayEvent()
     {
-         DetermineSeeker();
+        // DetermineSeeker();
 
 
+        //PhotonNetwork.LoadLevel(2); // open game scene
 
-       
-        
+        StartCoroutine(StartGameCo());
+    }
+
+    IEnumerator StartGameCo()
+    {
+        DetermineSeeker();
+
+        yield return new WaitForSeconds(1.5f);
 
         PhotonNetwork.LoadLevel(2); // open game scene
     }
+
 
     void UpdatePlayerList()
     {
@@ -110,6 +158,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
             {
                 newPlayeritem.ApplyLocalChanges();
             }
+
+
+            newPlayeritem.onCharacterChanged = SpawnPlayer;
 
             playerItemList.Add(newPlayeritem);
         }

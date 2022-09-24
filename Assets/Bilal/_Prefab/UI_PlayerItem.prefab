@@ -185,8 +185,8 @@ MonoBehaviour:
   leftArrowButton: {fileID: 894861410256679298}
   rightArrowButton: {fileID: 894861410659173844}
   avatars:
-  - {fileID: -1502429742, guid: fb8cc55af4b7a034584793949fd90500, type: 3}
-  - {fileID: -1221965184, guid: fb8cc55af4b7a034584793949fd90500, type: 3}
+  - {fileID: 506618871, guid: c1db4699ec9128f41af18ab04aae681e, type: 3}
+  - {fileID: 809231597, guid: bae69701f8c272f4c9f32ff793fd252f, type: 3}
 --- !u!1 &894861410025941170
 GameObject:
   m_ObjectHideFlags: 0

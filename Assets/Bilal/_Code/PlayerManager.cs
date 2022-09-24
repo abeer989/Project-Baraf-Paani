@@ -13,6 +13,7 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     public PlayerStaminaHandler staminaHandlerInstance;
     public PlayerFreezeShotController freezeShotControllerInstance;
     public PlayerPowerUpHandler powerUpHandlerInstance;
+    public PlayerVoiceSFXController voiceSfxInstance;
 
     [SerializeField] ParticleSystem iceParticleSystem;
     [SerializeField] SpriteRenderer playerSprite;
@@ -118,7 +119,18 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         if(photonView.IsMine)
         {
             if (isFrozen || isLocked)
+            {
+                if(Input.GetKeyDown(KeyCode.E) && !isSeeker)
+                {
+
+                    
+                    voiceSfxInstance.PlayBachaoOneShot();
+                    
+                }
+                   
+
                 return;
+            }
 
             bool isDashing = false;
 
@@ -143,6 +155,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
                 //{
                 //    return;
                 //}
+                if(isFrozen && !isSeeker)
+                {
+                    voiceSfxInstance.PlayBachaoOneShot();
+                }
+
 
                 if (isNearTarget)
                 {
@@ -156,7 +173,11 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
                             if (!targetPlayer.isFrozen && !targetPlayer.isSeeker)
                             {
                                 //GameManager_Bilal.instance.RPC_Freeze(targetPlayer.photonView.ViewID);
+
+
                                 targetPlayer.FreezePlayer();
+
+                              //  voiceSfxInstance.PlayBarafOneShot();
                             }
 
                         }
@@ -169,6 +190,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
                             {
                                 //GameManager_Bilal.instance.RPC_UnFreeze(targetPlayer.photonView.ViewID);
                                 targetPlayer.UnFreezePlayer();
+
+                                //voiceSfxInstance.PlayPaniOneShot();
                             }
                         }
 
@@ -277,6 +300,8 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     public void FreezePlayer()
     {
         camShakeController.ShakeCamera();
+
+
 
         Debug.Log("FreezingPlayer");
         photonView.RPC(nameof(RPC_Freeze), RpcTarget.All);
@@ -462,6 +487,14 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
         indicatorInstance.SetActiveBrufIndicator(true);
 
         iceParticleSystem.Play();
+
+        voiceSfxInstance.PlayBarafOneShot();
+
+        if(photonView.IsMine)
+        {
+            GameManager_Bilal.instance.uiManagerInstance.SetActiveIceOverLay(true);
+            voiceSfxInstance.PlayIceCrackSFXOneShot();
+        }
         
 
     }
@@ -473,14 +506,23 @@ public class PlayerManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicCall
     {
         Debug.Log($"{photonView.ViewID} UN Freezing me");
 
-        if (!photonView.IsMine)
-            return;
+        //if (!photonView.IsMine)
+        //    return;
 
         playerSprite.color = Color.white;
         isFrozen = false;
         indicatorInstance.SetActiveBrufIndicator(false);
 
         waterSplashPartiSystem.Play();
+
+
+        voiceSfxInstance.PlayPaniOneShot();
+
+        if (photonView.IsMine)
+        {
+            GameManager_Bilal.instance.uiManagerInstance.SetActiveIceOverLay(false);
+            voiceSfxInstance.PlayIceCrackSFXOneShot();
+        }
 
     }
 

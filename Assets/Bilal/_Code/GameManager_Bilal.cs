@@ -60,7 +60,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         uiManagerInstance.onStartClicked = StartGame;
         gameTimerInstance.onTimerFinishedEvent = WhenTimeOverFunction;
-        uiManagerInstance.onBackToRoomClicked = PlayAgainEvent;
+        uiManagerInstance.onBackToRoomClicked = LeaveRoom;
         uiManagerInstance.onleaveBtnClicked = LeaveRoom;
         uiManagerInstance.onReadyBtnClicked = OnReadyFunction;
 
@@ -146,7 +146,9 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         spawnPlayersInstance.SpawnPlayers();
 
 
-        yield return new WaitForSeconds(3);
+        yield return new WaitForSeconds(4);
+
+        uiManagerInstance.SetActiveLoadingPanel(false);
 
         yield return new WaitUntil(CheckIfAllReady);
 
@@ -164,10 +166,9 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         gameState = GameState.GameStart;
         isGameActive = true;
 
-        if(PhotonNetwork.IsMasterClient)
-        {
+       
            StartCoroutine( SpawnPowerUps());
-        }
+       
 
 
         // wait for game start timer
@@ -182,10 +183,12 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         gameState = GameState.GameEnd;
         isGameActive = false;
 
+        uiManagerInstance.SetActiveIceOverLay(false);
+
         if (areAllFrozen)
         {
             uiManagerInstance.SetActiveGameOverPanel(true);
-            uiManagerInstance.SetGameOverText("Seeker Won The Game");
+            uiManagerInstance.SetGameOverText("Catcher Team Won The Game");
 
             /// Updating LEader Boards
             if (spawnPlayersInstance.localPlayerManager.isSeeker)
@@ -213,7 +216,7 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
     }
 
-    WaitForSeconds powerUpDelay = new WaitForSeconds(10);
+    WaitForSeconds powerUpDelay = new WaitForSeconds(15);
 
     IEnumerator SpawnPowerUps()
     {
@@ -224,7 +227,12 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
         int i = 1;
         while(gameState == GameState.GameStart)
         {
+            
+
             yield return powerUpDelay;
+
+            if (!PhotonNetwork.IsMasterClient)
+                continue;
 
             var spawnPos = new Vector2(Random.Range(minPos.x, maxPos.x), Random.Range(minPos.y, maxPos.y));
             PhotonNetwork.InstantiateRoomObject(invincibilityPowerUpPrefab.name, spawnPos, Quaternion.identity);

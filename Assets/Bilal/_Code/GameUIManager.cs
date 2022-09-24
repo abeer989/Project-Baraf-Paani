@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI pingTxt;
 
     
+    [SerializeField] CanvasGroup iceOverLayCanvas;
+
+    [SerializeField] GameObject loadingPanel;
     
     private void Start()
     {
@@ -90,4 +94,33 @@ public class GameUIManager : MonoBehaviour
         countDownTimerTxt.text = txt;
     }
 
+    Tween iceOverLayTween;
+
+    public void SetActiveIceOverLay(bool state)
+    {
+        if(state)
+        {
+            if (iceOverLayTween != null) iceOverLayTween.Kill();
+
+            iceOverLayTween =  iceOverLayCanvas.DOFade(1, 0.5f);
+        }
+        else
+        {
+            if (iceOverLayTween != null) iceOverLayTween.Kill();
+
+            iceOverLayTween =  iceOverLayCanvas.DOFade(0, 0.5f);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (iceOverLayTween != null) iceOverLayTween.Kill();
+    }
+
+
+
+    public void SetActiveLoadingPanel(bool state)
+    {
+        loadingPanel.SetActive(state);
+    }
 }

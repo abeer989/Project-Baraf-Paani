@@ -35,7 +35,8 @@ public class PowerUpUIEffectController : MonoBehaviour
     {
         iceText.gameObject.SetActive(true);
         audioSrc.PlayOneShot(iceGunEffectSFX);
-        iceSeq.Play();
+       // iceSeq.Play();
+
 
     }
 
@@ -43,14 +44,16 @@ public class PowerUpUIEffectController : MonoBehaviour
     {
         invincibilityText.gameObject.SetActive(true);
         audioSrc.PlayOneShot(invincibilitySFX);
-        invinSeq.Play();
+       // invinSeq.Play();
     }
 
     void TweenIceSetup()
     {
+
+        Debug.Log("TweenIceSetup()");
         iceSeq = DOTween.Sequence();
 
-        iceSeq.Append(iceText.transform.DOScale(Vector3.one,tweenDuration).SetEase(easeType));
+        iceSeq.Append(iceText.gameObject.GetComponent<RectTransform>().DOScale(Vector3.one,tweenDuration).SetEase(easeType));
         iceSeq.Append(iceText.DOFade(0, fadeDuration));
         iceSeq.AppendCallback(ResetIceText);
 
@@ -60,9 +63,10 @@ public class PowerUpUIEffectController : MonoBehaviour
 
     void TweenInvinSetup()
     {
+        Debug.Log("TweenIceSetup()");
         invinSeq = DOTween.Sequence();
 
-        invinSeq.Append(invincibilityText.transform.DOScale(Vector3.one, tweenDuration).SetEase(easeType));
+        invinSeq.Append(invincibilityText.gameObject.GetComponent<RectTransform>().DOScale(Vector3.one, tweenDuration).SetEase(easeType));
         invinSeq.Append(invincibilityText.DOFade(0, fadeDuration));
         invinSeq.AppendCallback(ResetInvinText);
     }
@@ -71,12 +75,14 @@ public class PowerUpUIEffectController : MonoBehaviour
     {
         invincibilityText.transform.localScale = Vector3.zero;
         invincibilityText.gameObject.SetActive(false);
+        invincibilityText.color = Color.white;
     }
 
     void ResetIceText()
     {
         iceText.transform.localScale = Vector3.zero;
         iceText.gameObject.SetActive(false);
+        iceText.color = Color.white;
     }
 
 

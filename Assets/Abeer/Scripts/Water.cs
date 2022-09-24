@@ -33,7 +33,7 @@ public class Water : MonoBehaviour
             {
                 if (Input.GetKeyDown(KeyCode.E))
                 {
-                    PlayerController.instance.ToggleFreezeShot(true);
+                    
 
                     if (interactCanvas.activeInHierarchy)
                         interactCanvas.SetActive(false);

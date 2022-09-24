@@ -1,3 +1,4 @@
+using Photon.Pun;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -5,9 +6,12 @@ public class PlayerController : MonoBehaviour
     #region Variables/Ref.
     public static PlayerController instance;
 
+    public int greetingSFXIndex;
+
     [Header("Components")]
     [SerializeField] Rigidbody2D RB;
     [SerializeField] Animator animator;
+    [SerializeField] PlayerVoiceSFXController voiceSFXController;
 
     [Header("After-image")]
     [SerializeField] SpriteRenderer playerSR;
@@ -16,7 +20,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Freeze Shot")]
     [SerializeField] GameObject pivot;
-    [SerializeField] FreezeShotController freezeShotController;
+   
 
     [Header("Floats")]
     [SerializeField] float moveSpeed;
@@ -25,6 +29,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] float dashRechargeWait;
     [SerializeField] float timeBetweenAfterImages;
     [SerializeField] float afterImageLifeTime;
+
 
     BoxCollider2D playerBoundsBox;
 
@@ -37,6 +42,8 @@ public class PlayerController : MonoBehaviour
     float afterImageCounter;
 
     bool canMove = true;
+
+    PhotonView pv;
 
     // public properties:
     public string LastExitUsed
@@ -59,22 +66,38 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
-        if (instance == null)
+        //if (instance == null)
+        //{
+        //    instance = this;
+        //    DontDestroyOnLoad(this);
+        //}
+
+        //else
+        //{
+        //    if (instance != this)
+        //        Destroy(gameObject);
+        //}
+    }
+    #endregion
+
+
+    private void Start()
+    {
+        pv = GetComponent<PhotonView>();
+
+        if(!pv.IsMine)
         {
-            instance = this;
-            DontDestroyOnLoad(this);
+            RB.simulated = false;
         }
 
-        else
-        {
-            if (instance != this)
-                Destroy(gameObject);
-        }
-    } 
-    #endregion
+        
+    }
 
     void Update()
     {
+        if (!pv.IsMine)
+            return;
+
         #region Vertical/Horizontal Movement:
         float horizontalMovement = Input.GetAxisRaw(horizontalAxis);
         float verticalMovement = Input.GetAxisRaw(verticalAxis);
@@ -140,6 +163,11 @@ public class PlayerController : MonoBehaviour
         animator.SetFloat("moveX", RB.velocity.x);
         animator.SetFloat("moveY", RB.velocity.y);
         #endregion
+
+        if(Input.GetKeyDown(KeyCode.E))
+        {
+            voiceSFXController.PlayGreetingBasedOnCharacter(greetingSFXIndex);
+        }
     }
 
     /// <summary>
@@ -148,11 +176,7 @@ public class PlayerController : MonoBehaviour
     /// <param name="_boundsBox"></param>
     public void SetBounds(BoxCollider2D _boundsBox) => playerBoundsBox = _boundsBox;
 
-    public void ToggleFreezeShot(bool state)
-    {
-        pivot.SetActive(state);
-        freezeShotController.enabled = state;
-    }
+   
 
     void ShowAfterImage()
     {

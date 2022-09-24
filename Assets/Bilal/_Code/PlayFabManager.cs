@@ -34,36 +34,94 @@ public class PlayFabManager : MonoBehaviour
 
     #region Login Related
 
+    string playFabIDKey = "playfabId";
+
     public void LoginCustomID()
     {
-        LoginWithCustomIDRequest request = new LoginWithCustomIDRequest
+        Debug.Log("Login ...");
+       
+
+        if (/*PlayerPrefs.HasKey(playFabIDKey)*/ false)
         {
-            CustomId = SystemInfo.deviceUniqueIdentifier,
-            CreateAccount = true,
-
-            InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+            Debug.Log("Login ...");
+            LoginWithCustomIDRequest request = new LoginWithCustomIDRequest
             {
-                GetPlayerProfile = true
-            }
-        };
+                CustomId = PlayerPrefs.GetString(playFabIDKey),
 
-        PlayFabClientAPI.LoginWithCustomID(request,
-            OnLoginSuccess,
-            OnError);
+                CreateAccount = true,
+
+                InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+                {
+                    GetPlayerProfile = true,
+                    GetUserAccountInfo = true
+                }
+            };
+
+            PlayFabClientAPI.LoginWithCustomID(request,
+           OnLoginSuccess,
+           OnError);
+        }
+        else
+        {
+            Debug.Log("Login ...");
+            LoginWithCustomIDRequest request = new LoginWithCustomIDRequest
+            {
+
+                CustomId = $"USER{UnityEngine.Random.Range(0,999)}{UnityEngine.Random.Range(0, 999)}",
+
+                CreateAccount = true,
+
+                InfoRequestParameters = new GetPlayerCombinedInfoRequestParams
+                {
+                    GetPlayerProfile = true,
+                    GetUserAccountInfo = true
+                }
+            };
+
+            PlayFabClientAPI.LoginWithCustomID(request,
+           OnLoginSuccess,
+           OnError);
+        }
+
+        Debug.Log("Login ...");
+
+       
 
     }
 
     void OnLoginSuccess(LoginResult result)
     {
+
+
+        Debug.Log("OnLoginSuccess");
         if(result.InfoResultPayload.AccountInfo !=null)
         {
+            Debug.Log("OnLoginSuccess");
             playerAccountInfo = result.InfoResultPayload.AccountInfo;
         }
 
         if(result.InfoResultPayload.PlayerProfile !=null)
         {
+            Debug.Log("OnLoginSuccess");
             playerProfile = result.InfoResultPayload.PlayerProfile;
+
+            //Debug.Log($"{playerProfile}");
+
+            
+                //PlayerPrefs.SetString(playFabIDKey, playerProfile.PlayerId);
+               // PlayerPrefs.Save();
+            
+
+                
+
         }
+
+        Debug.Log($"{result.InfoResultPayload.AccountInfo.CustomIdInfo.CustomId}");
+
+        PlayerPrefs.SetString(playFabIDKey, result.InfoResultPayload.AccountInfo.CustomIdInfo.CustomId);
+        PlayerPrefs.Save();
+
+
     }
 
     public void UpdateName(string name)

@@ -508,6 +508,8 @@ GameObject:
   - component: {fileID: 4040483444702805218}
   - component: {fileID: 8545598234266686653}
   - component: {fileID: 635442705690089415}
+  - component: {fileID: 7354253324801721243}
+  - component: {fileID: 366198660663973434}
   m_Layer: 0
   m_Name: Player_Multi
   m_TagString: Untagged
@@ -652,6 +654,7 @@ MonoBehaviour:
   staminaHandlerInstance: {fileID: 8545598234266686653}
   freezeShotControllerInstance: {fileID: 635442705690089415}
   powerUpHandlerInstance: {fileID: 1408919281241484436}
+  voiceSfxInstance: {fileID: 7354253324801721243}
   iceParticleSystem: {fileID: 7937373403287382203}
   playerSprite: {fileID: 3624249202781090325}
   anim: {fileID: 3624249202781090320}
@@ -872,6 +875,121 @@ MonoBehaviour:
   iceBallPrefab: {fileID: 6565862487873032297, guid: 3183392e23419da4eb7d85585af49495, type: 3}
   pivot: {fileID: 0}
   firePoint: {fileID: 7518631008116078960}
+--- !u!114 &7354253324801721243
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3624249202781090321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6158d5aa51515d04186c58433bb050c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baraf_SFX: {fileID: 8300000, guid: 25f2abecdd9f9634d9a7920203f97913, type: 3}
+  pani_SFX: {fileID: 8300000, guid: ae8efa0833a1ccd4fb335b4c71bb0433, type: 3}
+  mujeBachao_SFX: {fileID: 8300000, guid: ce6553cb42461f94e953789ee1b9e0a3, type: 3}
+  kiaHaalHain_SFX: {fileID: 8300000, guid: 12b70fedc2988a94e966fafca0e1f6e5, type: 3}
+  keseHo_SFX: {fileID: 8300000, guid: 148bce5bba499c3409adf01daab48306, type: 3}
+  iceCrackSFx: {fileID: 8300000, guid: 05d977441a64c27439341c68cfe51e78, type: 3}
+  audioSrc: {fileID: 366198660663973434}
+--- !u!82 &366198660663973434
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3624249202781090321}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &4909184573976152425
 GameObject:
   m_ObjectHideFlags: 0
@@ -1964,7 +2082,8 @@ PrefabInstance:
       propertyPath: m_Materials.Array.size
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114913718520774464, guid: 77c69ec12208c4c4380d15e30b6f8f68, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 77c69ec12208c4c4380d15e30b6f8f68, type: 3}
 --- !u!198 &4625725669427447504 stripped
 ParticleSystem:

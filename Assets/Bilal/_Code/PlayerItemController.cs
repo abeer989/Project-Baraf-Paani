@@ -17,6 +17,7 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
     public Button leftArrowButton;
     public Button rightArrowButton;
 
+    public System.Action onCharacterChanged;
 
     ExitGames.Client.Photon.Hashtable playerProps = new ExitGames.Client.Photon.Hashtable();
 
@@ -105,11 +106,15 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
             img_PlayerAvatar.sprite = avatars[index];
             
             playerProps[playerAvatarKey] = index;
+
+            onCharacterChanged?.Invoke();
         }
         else
         {
             playerProps[playerAvatarKey] = 0;
-            
+
+            onCharacterChanged?.Invoke();
+
         }
         //PhotonNetwork.SetPlayerCustomProperties(playerProps);
     }
