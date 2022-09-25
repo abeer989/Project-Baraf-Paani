@@ -20,12 +20,14 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public Transform playerItemParents;
 
-    GameObject localPlayerObject;
+     GameObject localPlayerObject;
 
     [SerializeField] GameObject playerPrefab_1;
     [SerializeField] GameObject playerPrefab_2;
     private void Start()
     {
+
+        playButton.interactable = false;
 
         SpawnPlayer();
 
@@ -40,6 +42,10 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
         playButton.onClick.AddListener(OnClickPlayEvent);
         leaveBtn.onClick.AddListener(LeaveRoom);
+
+        MusicManager.instance.PlayRoomMusic();
+
+
     }
 
     private void Update()
@@ -56,6 +62,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
 
     public void SpawnPlayer()
     {
+       
+
         if(localPlayerObject!=null)
         {
             PhotonNetwork.Destroy(localPlayerObject);
@@ -118,7 +126,11 @@ public class RoomManager : MonoBehaviourPunCallbacks
     public void OnClickPlayEvent()
     {
         // DetermineSeeker();
-
+        if(PhotonNetwork.CurrentRoom.PlayerCount<3)
+        {
+            //show error
+            return;
+        }
 
         //PhotonNetwork.LoadLevel(2); // open game scene
 
@@ -178,6 +190,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
         
 
         UpdatePlayerList();
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount >= 3)
+            playButton.interactable = true;
     }
 
     public override void OnPlayerLeftRoom(Player otherPlayer)
@@ -185,6 +200,9 @@ public class RoomManager : MonoBehaviourPunCallbacks
         SetPlayerCountTxt(PhotonNetwork.CurrentRoom.PlayerCount);
 
         UpdatePlayerList();
+
+        if (PhotonNetwork.CurrentRoom.PlayerCount < 3)
+            playButton.interactable = false;
     }
 
 

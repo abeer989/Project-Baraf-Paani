@@ -100,6 +100,8 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
 
     void UpdatePlayerItem(Player player)
     {
+        
+
         if(player.CustomProperties.ContainsKey(playerAvatarKey))
         {
             int index = (int)player.CustomProperties[playerAvatarKey];
@@ -107,13 +109,15 @@ public class PlayerItemController : MonoBehaviourPunCallbacks
             
             playerProps[playerAvatarKey] = index;
 
-            onCharacterChanged?.Invoke();
+            if(player == this.player)
+                onCharacterChanged?.Invoke();
         }
         else
         {
             playerProps[playerAvatarKey] = 0;
 
-            onCharacterChanged?.Invoke();
+            if (player == this.player)
+                onCharacterChanged?.Invoke();
 
         }
         //PhotonNetwork.SetPlayerCustomProperties(playerProps);

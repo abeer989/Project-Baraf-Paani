@@ -41,7 +41,7 @@ public class PlayFabManager : MonoBehaviour
         Debug.Log("Login ...");
        
 
-        if (/*PlayerPrefs.HasKey(playFabIDKey)*/ false)
+        if (/*PlayerPrefs.HasKey(playFabIDKey)*/ PlayerPrefs.HasKey(playFabIDKey))
         {
             Debug.Log("Login ...");
             LoginWithCustomIDRequest request = new LoginWithCustomIDRequest

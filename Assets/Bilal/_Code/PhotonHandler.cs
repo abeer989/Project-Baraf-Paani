@@ -148,6 +148,8 @@ public class PhotonHandler : MonoBehaviourPunCallbacks
         lobbyUImanagerInstance.SetActiveLoadingPanel(false);
         titleUImanagerInstance.InitializeTitleTween();
 
+        MusicManager.instance.PlayTitleMusic();
+
     }
 
     public override void OnJoinedRoom()

@@ -143,6 +143,8 @@ public class GameManager_Bilal : MonoBehaviourPunCallbacks
 
         yield return new WaitForSeconds(1);
 
+        MusicManager.instance.PlayGameMusic();
+
         spawnPlayersInstance.SpawnPlayers();
 
 
